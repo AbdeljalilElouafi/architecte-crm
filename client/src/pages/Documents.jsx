@@ -14,6 +14,7 @@ import {
 import { documentsAPI, clientsAPI, projectsAPI } from "../services/api.jsx"
 import DocumentUploadModal from "../components/Documents/DocumentUploadModal.jsx"
 import DeleteConfirmModal from "../components/Common/DeleteConfirmModal.jsx"
+import Select from "react-select"
 
 export default function Documents() {
   const [documents, setDocuments] = useState([])
@@ -49,7 +50,7 @@ export default function Documents() {
       setDocuments(response.data.documents)
       setTotalPages(response.data.totalPages)
     } catch (error) {
-      console.error("Failed to fetch documents:", error)
+      console.error("Échec de la récupération des documents:", error)
     } finally {
       setLoading(false)
     }
@@ -60,7 +61,7 @@ export default function Documents() {
       const response = await clientsAPI.getAll({ limit: 100 })
       setClients(response.data.clients)
     } catch (error) {
-      console.error("Failed to fetch clients:", error)
+      console.error("Échec de la récupération des clients:", error)
     }
   }
 
@@ -69,7 +70,7 @@ export default function Documents() {
       const response = await projectsAPI.getAll({ limit: 100 })
       setProjects(response.data.projects)
     } catch (error) {
-      console.error("Failed to fetch projects:", error)
+      console.error("Échec de la récupération des projets:", error)
     }
   }
 
@@ -87,7 +88,7 @@ export default function Documents() {
       setDeleteModal({ show: false, document: null })
       fetchDocuments()
     } catch (error) {
-      console.error("Failed to delete document:", error)
+      console.error("Échec de la suppression du document:", error)
     }
   }
 
@@ -103,7 +104,7 @@ export default function Documents() {
       const response = await documentsAPI.download(document.id)
       window.open(response.data.downloadUrl, "_blank")
     } catch (error) {
-      console.error("Failed to download document:", error)
+      console.error("Échec du téléchargement du document:", error)
     }
   }
 
@@ -129,15 +130,15 @@ export default function Documents() {
 
   const documentTypes = [
     { value: "cin", label: "CIN" },
-    { value: "title_deed", label: "Title Deed" },
-    { value: "cadastral_map", label: "Cadastral Map" },
-    { value: "contract", label: "Contract" },
+    { value: "title_deed", label: "Titre de propriété" },
+    { value: "cadastral_map", label: "Plan cadastral" },
+    { value: "contract", label: "Contrat" },
     { value: "plan", label: "Plan" },
-    { value: "3d_rendering", label: "3D Rendering" },
-    { value: "receipt", label: "Receipt" },
-    { value: "invoice", label: "Invoice" },
-    { value: "permit", label: "Permit" },
-    { value: "other", label: "Other" },
+    { value: "3d_rendering", label: "Rendu 3D" },
+    { value: "receipt", label: "Reçu" },
+    { value: "invoice", label: "Facture" },
+    { value: "permit", label: "Permis" },
+    { value: "other", label: "Autre" },
   ]
 
   if (loading && documents.length === 0) {
@@ -154,14 +155,14 @@ export default function Documents() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Documents</h1>
-          <p className="mt-1 text-sm text-gray-500">Manage your project and client documents</p>
+          <p className="mt-1 text-sm text-gray-500">Gérez les documents de vos projets et clients</p>
         </div>
         <button
           onClick={handleUploadDocument}
           className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         >
           <PlusIcon className="h-4 w-4 mr-2" />
-          Upload Document
+          Téléverser un document
         </button>
       </div>
 
@@ -169,51 +170,67 @@ export default function Documents() {
       <div className="bg-white p-4 rounded-lg shadow">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="relative">
-            <MagnifyingGlassIcon className="h-5 w-5 absolute left-3 top-3 text-gray-400" />
+            <MagnifyingGlassIcon className="h-5 w-5 absolute left-2 top-2 text-gray-400" />
             <input
               type="text"
-              placeholder="Search documents..."
+              placeholder="Rechercher des documents..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="pl-10 h-full w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             />
           </div>
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            className="rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
           >
-            <option value="">All Document Types</option>
+            <option value="">Tous les types</option>
             {documentTypes.map((type) => (
               <option key={type.value} value={type.value}>
                 {type.label}
               </option>
             ))}
           </select>
-          <select
-            value={clientFilter}
-            onChange={(e) => setClientFilter(e.target.value)}
-            className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          >
-            <option value="">All Clients</option>
-            {clients.map((client) => (
-              <option key={client.id} value={client.id}>
-                {client.firstName} {client.lastName}
-              </option>
-            ))}
-          </select>
-          <select
-            value={projectFilter}
-            onChange={(e) => setProjectFilter(e.target.value)}
-            className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          >
-            <option value="">All Projects</option>
-            {projects.map((project) => (
-              <option key={project.id} value={project.id}>
-                {project.title}
-              </option>
-            ))}
-          </select>
+          <Select
+            options={[
+              { value: '', label: 'Tous les clients' },
+              ...clients.map(client => ({
+                value: client.id,
+                label: `${client.firstName} ${client.lastName}`
+              }))
+            ]}
+            value={clients.find(c => c.id === clientFilter) 
+              ? { 
+                  value: clientFilter, 
+                  label: `${clients.find(c => c.id === clientFilter).firstName} ${clients.find(c => c.id === clientFilter).lastName}`
+                }
+              : { value: '', label: 'Tous les clients' }
+            }
+            onChange={(selectedOption) => setClientFilter(selectedOption.value)}
+            isClearable={false}
+            className="react-select-container"
+            classNamePrefix="react-select"
+          />
+          <Select
+            options={[
+              { value: '', label: 'Tous les projets' },
+              ...projects.map(project => ({
+                value: project.id,
+                label: project.title
+              }))
+            ]}
+            value={projects.find(p => p.id === projectFilter)
+              ? {
+                  value: projectFilter,
+                  label: projects.find(p => p.id === projectFilter).title
+                }
+              : { value: '', label: 'Tous les projets' }
+            }
+            onChange={(selectedOption) => setProjectFilter(selectedOption.value)}
+            isClearable={false}
+            className="react-select-container"
+            classNamePrefix="react-select"
+          />
         </div>
       </div>
 
@@ -222,15 +239,15 @@ export default function Documents() {
         {documents.length === 0 ? (
           <div className="p-6 text-center">
             <DocumentIcon className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No documents found</h3>
-            <p className="mt-1 text-sm text-gray-500">Get started by uploading a new document.</p>
+            <h3 className="mt-2 text-sm font-medium text-gray-900">Aucun document trouvé</h3>
+            <p className="mt-1 text-sm text-gray-500">Commencez par téléverser un nouveau document.</p>
             <div className="mt-6">
               <button
                 onClick={handleUploadDocument}
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
                 <PlusIcon className="h-4 w-4 mr-2" />
-                Upload Document
+                Téléverser un document
               </button>
             </div>
           </div>
@@ -243,16 +260,16 @@ export default function Documents() {
                     Document
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Related To
+                    Associé à
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Type
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Price
+                    Prix
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Uploaded
+                    Téléversé le
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
@@ -278,33 +295,42 @@ export default function Documents() {
                             Client: {document.client.firstName} {document.client.lastName}
                           </div>
                         )}
-                        {document.project && <div className="text-gray-900">Project: {document.project.title}</div>}
+                        {document.project && <div className="text-gray-900">Projet: {document.project.title}</div>}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                        {document.type.replace("_", " ")}
+                        {document.type === 'title_deed' && 'Titre de propriété'}
+                        {document.type === 'cadastral_map' && 'Plan cadastral'}
+                        {document.type === 'contract' && 'Contrat'}
+                        {document.type === '3d_rendering' && 'Rendu 3D'}
+                        {document.type === 'invoice' && 'Facture'}
+                        {document.type === 'receipt' && 'Reçu'}
+                        {document.type === 'permit' && 'Permis'}
+                        {document.type === 'cin' && 'CIN'}
+                        {document.type === 'plan' && 'Plan'}
+                        {document.type === 'other' && 'Autre'}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {document.price > 0 ? `${document.price.toLocaleString()} MAD` : "-"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(document.createdAt).toLocaleDateString()}
+                      {new Date(document.createdAt).toLocaleDateString('fr-FR')}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex space-x-2">
                         <button
                           onClick={() => handleDownload(document)}
                           className="text-blue-600 hover:text-blue-900"
-                          title="Download"
+                          title="Télécharger"
                         >
                           <ArrowDownTrayIcon className="h-4 w-4" />
                         </button>
                         <button
                           onClick={() => handleDeleteDocument(document)}
                           className="text-red-600 hover:text-red-900"
-                          title="Delete"
+                          title="Supprimer"
                         >
                           <TrashIcon className="h-4 w-4" />
                         </button>
@@ -324,20 +350,20 @@ export default function Documents() {
                     disabled={currentPage === 1}
                     className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
                   >
-                    Previous
+                    Précédent
                   </button>
                   <button
                     onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                     disabled={currentPage === totalPages}
                     className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
                   >
-                    Next
+                    Suivant
                   </button>
                 </div>
                 <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                   <div>
                     <p className="text-sm text-gray-700">
-                      Page <span className="font-medium">{currentPage}</span> of{" "}
+                      Page <span className="font-medium">{currentPage}</span> sur{" "}
                       <span className="font-medium">{totalPages}</span>
                     </p>
                   </div>
@@ -377,8 +403,8 @@ export default function Documents() {
 
       {deleteModal.show && (
         <DeleteConfirmModal
-          title="Delete Document"
-          message={`Are you sure you want to delete "${deleteModal.document?.name}"? This action cannot be undone.`}
+          title="Supprimer le document"
+          message={`Êtes-vous sûr de vouloir supprimer "${deleteModal.document?.name}" ? Cette action est irréversible.`}
           onConfirm={confirmDelete}
           onCancel={() => setDeleteModal({ show: false, document: null })}
         />

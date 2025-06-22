@@ -2,6 +2,7 @@ const express = require("express")
 const {
   getAllPayments,
   getPaymentById,
+  getPaymentsByProject,
   createPayment,
   updatePayment,
   deletePayment,
@@ -17,6 +18,7 @@ router.get("/", getAllPayments)
 router.get("/stats", getPaymentStats)
 router.get("/:id", getPaymentById)
 router.post("/", createPayment)
+router.get("/project/:projectId", getPaymentsByProject)
 router.put("/:id", updatePayment)
 router.delete("/:id", deletePayment)
 

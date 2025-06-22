@@ -29,7 +29,7 @@ const Client = sequelize.define("Client", {
   },
   cin: {
     type: DataTypes.STRING,
-    unique: true,
+    unique: 'cin_unique',
   },
   notes: {
     type: DataTypes.TEXT,

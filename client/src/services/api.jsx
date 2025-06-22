@@ -82,6 +82,7 @@ export const paymentsAPI = {
   create: (data) => api.post("/payments", data),
   update: (id, data) => api.put(`/payments/${id}`, data),
   delete: (id) => api.delete(`/payments/${id}`),
+  getByProject: (projectId) => api.get(`/payments/project/${projectId}`),
   getStats: (params) => api.get("/payments/stats", { params }),
 }
 

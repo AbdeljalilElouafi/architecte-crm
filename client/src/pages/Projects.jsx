@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
+import { useState, useEffect, useCallback} from "react"
+import { useNavigate } from "react-router-dom"
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"
 import {
   PlusIcon,
@@ -15,21 +15,40 @@ import {
 import { projectsAPI, clientsAPI } from "../services/api.jsx"
 import ProjectModal from "../components/Projects/ProjectModal"
 import DeleteConfirmModal from "../components/Common/DeleteConfirmModal"
+import Select from "react-select"
 
 const statusColumns = {
-  planning: { title: "Planning", color: "bg-gray-100" },
-  in_progress: { title: "In Progress", color: "bg-blue-100" },
-  review: { title: "Review", color: "bg-yellow-100" },
-  completed: { title: "Completed", color: "bg-green-100" },
-  on_hold: { title: "On Hold", color: "bg-red-100" },
+  planning: { title: "Planification", color: "bg-gray-100" },
+  in_progress: { title: "En cours", color: "bg-blue-100" },
+  review: { title: "Révision", color: "bg-yellow-100" },
+  completed: { title: "Terminé", color: "bg-green-100" },
+  on_hold: { title: "En attente", color: "bg-red-100" },
 }
 
+  const useDebounce = (value, delay) => {
+    const [debouncedValue, setDebouncedValue] = useState(value)
+
+    useEffect(() => {
+      const handler = setTimeout(() => {
+        setDebouncedValue(value)
+      }, delay)
+
+      return () => {
+        clearTimeout(handler)
+      }
+    }, [value, delay])
+
+    return debouncedValue
+  }
+
 export default function Projects() {
+  const navigate = useNavigate()
   const [projects, setProjects] = useState([])
   const [clients, setClients] = useState([])
   const [loading, setLoading] = useState(true)
-  const [viewMode, setViewMode] = useState("kanban") // kanban or list
+  const [viewMode, setViewMode] = useState("list") 
   const [searchTerm, setSearchTerm] = useState("")
+  const debouncedSearchTerm = useDebounce(searchTerm, 300)
   const [statusFilter, setStatusFilter] = useState("")
   const [clientFilter, setClientFilter] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
@@ -41,7 +60,7 @@ export default function Projects() {
   useEffect(() => {
     fetchProjects()
     fetchClients()
-  }, [currentPage, searchTerm, statusFilter, clientFilter])
+  }, [currentPage, debouncedSearchTerm, statusFilter, clientFilter])
 
   const fetchProjects = async () => {
     try {
@@ -77,13 +96,19 @@ export default function Projects() {
     setShowModal(true)
   }
 
-  const handleEditProject = (project) => {
+  const handleEditProject = (project, e) => {
+    e?.stopPropagation() // Prevent card click when editing
     setEditingProject(project)
     setShowModal(true)
   }
 
-  const handleDeleteProject = (project) => {
+  const handleDeleteProject = (project, e) => {
+    e?.stopPropagation() // Prevent card click when deleting
     setDeleteModal({ show: true, project })
+  }
+
+  const handleProjectClick = (projectId) => {
+    navigate(`/projects/${projectId}`)
   }
 
   const confirmDelete = async () => {
@@ -142,12 +167,13 @@ export default function Projects() {
 
   const filteredProjects = projects.filter((project) => {
     return (
+      project && 
       (!searchTerm ||
-        project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        project.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         project.client?.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         project.client?.lastName?.toLowerCase().includes(searchTerm.toLowerCase())) &&
       (!statusFilter || project.status === statusFilter) &&
-      (!clientFilter || project.clientId.toString() === clientFilter)
+      (!clientFilter || project.clientId?.toString() === clientFilter)
     )
   })
 
@@ -169,8 +195,8 @@ export default function Projects() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Projects</h1>
-          <p className="mt-1 text-sm text-gray-500">Manage your architectural projects and track progress</p>
+          <h1 className="text-2xl font-bold text-gray-900">Projets</h1>
+          <p className="mt-1 text-sm text-gray-500">Gérez vos projets architecturaux et suivez les progrès</p>
         </div>
         <div className="flex space-x-3">
           <div className="flex rounded-md shadow-sm">
@@ -192,7 +218,7 @@ export default function Projects() {
                   : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
               }`}
             >
-              List
+              Liste
             </button>
           </div>
           <button
@@ -200,7 +226,7 @@ export default function Projects() {
             className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
             <PlusIcon className="h-4 w-4 mr-2" />
-            Add Project
+            Ajouter un projet
           </button>
         </div>
       </div>
@@ -209,39 +235,68 @@ export default function Projects() {
       <div className="bg-white p-4 rounded-lg shadow">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="relative">
-            <MagnifyingGlassIcon className="h-5 w-5 absolute left-3 top-3 text-gray-400" />
+            <MagnifyingGlassIcon className="h-5 w-5 absolute left-2 top-2 text-gray-400" />
             <input
               type="text"
-              placeholder="Search projects..."
+              placeholder="Rechercher des projets..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="pl-10 h-full  w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             />
           </div>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            className="rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
           >
-            <option value="">All Statuses</option>
+            <option value="">Tous les statuts</option>
             {Object.entries(statusColumns).map(([key, { title }]) => (
               <option key={key} value={key}>
                 {title}
               </option>
             ))}
           </select>
-          <select
-            value={clientFilter}
-            onChange={(e) => setClientFilter(e.target.value)}
-            className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          >
-            <option value="">All Clients</option>
-            {clients.map((client) => (
-              <option key={client.id} value={client.id}>
-                {client.firstName} {client.lastName}
-              </option>
-            ))}
-          </select>
+          <Select
+            options={[
+              { value: "", label: "Tous les clients" },
+              ...clients.map((client) => ({
+                value: client.id,
+                label: `${client.firstName} ${client.lastName}`,
+              })),
+            ]}
+            value={
+              clientFilter
+                ? {
+                    value: clientFilter,
+                    label: (() => {
+                      const client = clients.find((c) => c.id === clientFilter)
+                      return client ? `${client.firstName} ${client.lastName}` : "Tous les clients"
+                    })(),
+                  }
+                : { value: "", label: "Tous les clients" }
+            }
+            onChange={(selectedOption) => setClientFilter(selectedOption?.value || "")}
+            isClearable={false}
+            className="basic-select"
+            classNamePrefix="select"
+            styles={{
+              control: (provided) => ({
+                ...provided,
+                borderRadius: "0.375rem",
+                borderColor: "#d1d5db",
+                boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+                "&:hover": {
+                  borderColor: "#d1d5db",
+                },
+                "&:focus-within": {
+                  borderColor: "#3b82f6",
+                  boxShadow: "0 0 0 1px #3b82f6",
+                },
+                minHeight: "38px",
+                width: "100%",
+              }),
+            }}
+          />
         </div>
       </div>
 
@@ -253,7 +308,7 @@ export default function Projects() {
               <div key={status} className="bg-white rounded-lg shadow">
                 <div className={`${color} px-4 py-3 rounded-t-lg`}>
                   <h3 className="font-medium text-gray-900">{title}</h3>
-                  <p className="text-sm text-gray-600">{groupedProjects[status]?.length || 0} projects</p>
+                  <p className="text-sm text-gray-600">{groupedProjects[status]?.length || 0} projets</p>
                 </div>
                 <Droppable droppableId={status}>
                   {(provided, snapshot) => (
@@ -269,9 +324,10 @@ export default function Projects() {
                               ref={provided.innerRef}
                               {...provided.draggableProps}
                               {...provided.dragHandleProps}
-                              className={`bg-white border rounded-lg p-4 mb-3 shadow-sm hover:shadow-md transition-shadow ${
+                              className={`bg-white border rounded-lg p-4 mb-3 shadow-sm hover:shadow-md transition-shadow cursor-pointer ${
                                 snapshot.isDragging ? "rotate-3 shadow-lg" : ""
                               }`}
+                              onClick={() => handleProjectClick(project.id)}
                             >
                               <ProjectCard
                                 project={project}
@@ -295,6 +351,7 @@ export default function Projects() {
           projects={filteredProjects}
           onEdit={handleEditProject}
           onDelete={handleDeleteProject}
+          onProjectClick={handleProjectClick}
           currentPage={currentPage}
           totalPages={totalPages}
           setCurrentPage={setCurrentPage}
@@ -306,8 +363,8 @@ export default function Projects() {
 
       {deleteModal.show && (
         <DeleteConfirmModal
-          title="Delete Project"
-          message={`Are you sure you want to delete "${deleteModal.project?.title}"? This action cannot be undone.`}
+          title="Supprimer le Projet"
+          message={`Êtes-vous sûr de vouloir supprimer "${deleteModal.project?.title}" ? Cette action ne peut pas être annulée.`}
           onConfirm={confirmDelete}
           onCancel={() => setDeleteModal({ show: false, project: null })}
         />
@@ -317,89 +374,113 @@ export default function Projects() {
 }
 
 function ProjectCard({ project, onEdit, onDelete }) {
+  const getPriorityColor = (priority) => {
+    const colors = {
+      urgent: "bg-red-100 text-red-800",
+      high: "bg-orange-100 text-orange-800", 
+      medium: "bg-yellow-100 text-yellow-800",
+      low: "bg-green-100 text-green-800"
+    }
+    return colors[priority] || colors.low
+  }
+
+  const getPriorityLabel = (priority) => {
+    const labels = { urgent: "urgent", high: "élevée", medium: "moyenne", low: "faible" }
+    return labels[priority] || priority
+  }
+
   return (
-    <div className="space-y-3">
-      <div className="flex justify-between items-start">
-        <h4 className="font-medium text-gray-900 text-sm line-clamp-2">{project.title}</h4>
-        <div className="flex space-x-1">
-          <button onClick={() => onEdit(project)} className="text-gray-400 hover:text-blue-600" title="Edit">
-            <PencilIcon className="h-4 w-4" />
+    <div className="p-2 space-y-1.5 text-xs">
+      {/* Header */}
+      <div className="flex justify-between items-start gap-1.5">
+        <h4 className="font-medium text-gray-900 text-sm leading-tight flex-1">{project.title}</h4>
+                  <div className="flex gap-0.5">
+          <button onClick={(e) => onEdit(project, e)} className="text-gray-400 hover:text-blue-600 p-0.5 rounded" title="Modifier">
+            <PencilIcon className="h-3.5 w-3.5" />
           </button>
-          <button onClick={() => onDelete(project)} className="text-gray-400 hover:text-red-600" title="Delete">
-            <TrashIcon className="h-4 w-4" />
+          <button onClick={(e) => onDelete(project, e)} className="text-gray-400 hover:text-red-600 p-0.5 rounded" title="Supprimer">
+            <TrashIcon className="h-3.5 w-3.5" />
           </button>
         </div>
       </div>
 
-      <div className="flex items-center text-xs text-gray-500">
-        <UserIcon className="h-3 w-3 mr-1" />
-        {project.client?.firstName} {project.client?.lastName}
-      </div>
-
-      <div className="flex items-center justify-between text-xs">
-        <span
-          className={`inline-flex items-center px-2 py-1 rounded-full font-medium ${
-            project.priority === "urgent"
-              ? "bg-red-100 text-red-800"
-              : project.priority === "high"
-                ? "bg-orange-100 text-orange-800"
-                : project.priority === "medium"
-                  ? "bg-yellow-100 text-yellow-800"
-                  : "bg-green-100 text-green-800"
-          }`}
-        >
-          {project.priority}
+      {/* Client & Priority Row */}
+      <div className="flex justify-between items-center">
+        <div className="flex items-center text-gray-500">
+          <UserIcon className="h-3 w-3 mr-1" />
+          <span>{project.client?.firstName} {project.client?.lastName}</span>
+        </div>
+        <span className={`px-1.5 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(project.priority)}`}>
+          {getPriorityLabel(project.priority)}
         </span>
       </div>
 
+      {/* Financial Info */}
       {project.financialSummary && (
-        <div className="text-xs text-gray-600">
-          <div className="flex justify-between">
-            <span>Total:</span>
-            <span className="font-medium">{project.financialSummary.totalPrice.toLocaleString()} MAD</span>
+        <div className="space-y-0.5">
+          <div className="flex justify-between text-gray-600">
+            <span>{project.financialSummary.totalPaid.toLocaleString()} / {project.financialSummary.totalPrice.toLocaleString()} MAD</span>
           </div>
-          <div className="flex justify-between">
-            <span>Paid:</span>
-            <span className="text-green-600">{project.financialSummary.totalPaid.toLocaleString()} MAD</span>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-1.5 mt-1">
-            <div
-              className="bg-green-600 h-1.5 rounded-full"
+          <div className="w-full bg-gray-200 rounded-full h-1">
+            <div 
+              className="bg-green-600 h-1 rounded-full" 
               style={{ width: `${Math.min(100, project.financialSummary.paymentProgress)}%` }}
-            ></div>
+            />
           </div>
         </div>
       )}
 
+      {/* Date */}
       {project.startDate && (
-        <div className="flex items-center text-xs text-gray-500">
+        <div className="flex items-center text-gray-500">
           <CalendarIcon className="h-3 w-3 mr-1" />
-          {new Date(project.startDate).toLocaleDateString()}
+          <span>{new Date(project.startDate).toLocaleDateString()}</span>
         </div>
       )}
     </div>
   )
 }
 
-function ProjectsList({ projects, onEdit, onDelete, currentPage, totalPages, setCurrentPage }) {
+function ProjectsList({ projects, onEdit, onDelete, onProjectClick, currentPage, totalPages, setCurrentPage }) {
+  const getStatusLabel = (status) => {
+    const labels = {
+      planning: "planification",
+      in_progress: "en cours",
+      review: "révision",
+      completed: "terminé",
+      on_hold: "en attente",
+    }
+    return labels[status] || status.replace("_", " ")
+  }
+
+  const getPriorityLabel = (priority) => {
+    const labels = {
+      urgent: "urgent",
+      high: "élevée",
+      medium: "moyenne",
+      low: "faible",
+    }
+    return labels[priority] || priority
+  }
+
   return (
     <div className="bg-white shadow rounded-lg overflow-hidden">
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
           <tr>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Project</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Projet</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priorité</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Financial
+              Financier
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {projects.map((project) => (
-            <tr key={project.id} className="hover:bg-gray-50">
+            <tr key={project.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => onProjectClick(project.id)}>
               <td className="px-6 py-4 whitespace-nowrap">
                 <div>
                   <div className="text-sm font-medium text-gray-900">{project.title}</div>
@@ -425,7 +506,7 @@ function ProjectsList({ projects, onEdit, onDelete, currentPage, totalPages, set
                             : "bg-gray-100 text-gray-800"
                   }`}
                 >
-                  {project.status?.replace("_", " ")}
+                  {getStatusLabel(project.status)}
                 </span>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
@@ -440,32 +521,43 @@ function ProjectsList({ projects, onEdit, onDelete, currentPage, totalPages, set
                           : "bg-green-100 text-green-800"
                   }`}
                 >
-                  {project.priority}
+                  {getPriorityLabel(project.priority)}
                 </span>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 {project.financialSummary ? (
                   <div className="text-sm">
                     <div className="text-gray-900">{project.financialSummary.totalPrice.toLocaleString()} MAD</div>
-                    <div className="text-green-600">{project.financialSummary.totalPaid.toLocaleString()} paid</div>
+                    <div className="text-green-600">{project.financialSummary.totalPaid.toLocaleString()} payé</div>
                   </div>
                 ) : (
-                  <div className="text-sm text-gray-500">No financial data</div>
+                  <div className="text-sm text-gray-500">Aucune donnée financière</div>
                 )}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <div className="flex space-x-2">
-                  <Link to={`/projects/${project.id}`} className="text-blue-600 hover:text-blue-900" title="View">
-                    <EyeIcon className="h-4 w-4" />
-                  </Link>
                   <button
-                    onClick={() => onEdit(project)}
-                    className="text-indigo-600 hover:text-indigo-900"
-                    title="Edit"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onProjectClick(project.id)
+                    }}
+                    className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50"
+                    title="Voir"
+                  >
+                    <EyeIcon className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={(e) => onEdit(project, e)}
+                    className="text-indigo-600 hover:text-indigo-900 p-1 rounded hover:bg-indigo-50"
+                    title="Modifier"
                   >
                     <PencilIcon className="h-4 w-4" />
                   </button>
-                  <button onClick={() => onDelete(project)} className="text-red-600 hover:text-red-900" title="Delete">
+                  <button
+                    onClick={(e) => onDelete(project, e)}
+                    className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50"
+                    title="Supprimer"
+                  >
                     <TrashIcon className="h-4 w-4" />
                   </button>
                 </div>
@@ -484,20 +576,20 @@ function ProjectsList({ projects, onEdit, onDelete, currentPage, totalPages, set
               disabled={currentPage === 1}
               className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
             >
-              Previous
+              Précédent
             </button>
             <button
               onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
               disabled={currentPage === totalPages}
               className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
             >
-              Next
+              Suivant
             </button>
           </div>
           <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
             <div>
               <p className="text-sm text-gray-700">
-                Page <span className="font-medium">{currentPage}</span> of{" "}
+                Page <span className="font-medium">{currentPage}</span> sur{" "}
                 <span className="font-medium">{totalPages}</span>
               </p>
             </div>

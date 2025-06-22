@@ -29,7 +29,7 @@ export default function Register() {
     setError("")
 
     if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match")
+      setError("Les mots de passe ne correspondent pas")
       setLoading(false)
       return
     }
@@ -44,7 +44,7 @@ export default function Register() {
       })
       setSuccess(true)
     } catch (error) {
-      setError(error.response?.data?.message || "Registration failed")
+      setError(error.response?.data?.message || "Échec de l'inscription")
     } finally {
       setLoading(false)
     }
@@ -62,15 +62,15 @@ export default function Register() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
           <div className="text-center">
-            <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Registration Successful!</h2>
+            <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Inscription Réussie !</h2>
             <p className="mt-2 text-sm text-gray-600">
-              Your account has been created. Please contact an administrator to activate your account.
+              Votre compte a été créé. Veuillez contacter un administrateur pour activer votre compte.
             </p>
             <Link
               to="/login"
               className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
             >
-              Go to Login
+              Aller à la Connexion
             </Link>
           </div>
         </div>
@@ -82,11 +82,11 @@ export default function Register() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Create Account</h2>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Créer un Compte</h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Join the Architect CRM team
+            Rejoignez l'équipe Architect CRM
             <Link to="/login" className="ml-1 font-medium text-blue-600 hover:text-blue-500">
-              or sign in to existing account
+              ou connectez-vous à un compte existant
             </Link>
           </p>
         </div>
@@ -101,7 +101,7 @@ export default function Register() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
-                  First Name
+                  Prénom
                 </label>
                 <input
                   id="firstName"
@@ -116,7 +116,7 @@ export default function Register() {
 
               <div>
                 <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
-                  Last Name
+                  Nom de Famille
                 </label>
                 <input
                   id="lastName"
@@ -132,7 +132,7 @@ export default function Register() {
 
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email address
+                Adresse Email
               </label>
               <input
                 id="email"
@@ -147,7 +147,7 @@ export default function Register() {
 
             <div>
               <label htmlFor="role" className="block text-sm font-medium text-gray-700">
-                Role
+                Rôle
               </label>
               <select
                 id="role"
@@ -156,14 +156,14 @@ export default function Register() {
                 onChange={handleChange}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               >
-                <option value="team_member">Team Member</option>
-                <option value="architect">Architect</option>
+                <option value="team_member">Membre de l'Équipe</option>
+                <option value="architect">Architecte</option>
               </select>
             </div>
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password
+                Mot de Passe
               </label>
               <input
                 id="password"
@@ -178,7 +178,7 @@ export default function Register() {
 
             <div>
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                Confirm Password
+                Confirmer le Mot de Passe
               </label>
               <input
                 id="confirmPassword"
@@ -198,7 +198,7 @@ export default function Register() {
               disabled={loading}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? "Creating Account..." : "Create Account"}
+              {loading ? "Création du Compte..." : "Créer un Compte"}
             </button>
           </div>
         </form>

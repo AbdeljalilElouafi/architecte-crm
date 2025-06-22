@@ -4,6 +4,7 @@ import { useState, useRef } from "react"
 import { documentsAPI } from "../../services/api.jsx"
 import Modal from "../Common/Modal"
 import { DocumentIcon } from "@heroicons/react/24/outline"
+import Select from "react-select"
 
 export default function DocumentUploadModal({ clients, projects, documentTypes, onClose }) {
   const [formData, setFormData] = useState({
@@ -37,13 +38,13 @@ export default function DocumentUploadModal({ clients, projects, documentTypes, 
 
   const validateForm = () => {
     const newErrors = {}
-    if (!selectedFile) newErrors.file = "Please select a file to upload"
-    if (!formData.type) newErrors.type = "Document type is required"
+    if (!selectedFile) newErrors.file = "Veuillez sélectionner un fichier à téléverser"
+    if (!formData.type) newErrors.type = "Le type de document est requis"
     if (!formData.clientId && !formData.projectId) {
-      newErrors.clientId = "Please select either a client or a project"
+      newErrors.clientId = "Veuillez sélectionner un client ou un projet"
     }
     if (formData.price && isNaN(Number(formData.price))) {
-      newErrors.price = "Price must be a valid number"
+      newErrors.price = "Le prix doit être un nombre valide"
     }
 
     setErrors(newErrors)
@@ -73,34 +74,45 @@ export default function DocumentUploadModal({ clients, projects, documentTypes, 
       await documentsAPI.upload(uploadFormData)
       onClose(true)
     } catch (error) {
-      console.error("Failed to upload document:", error)
-      setErrors({ submit: error.response?.data?.message || "Failed to upload document" })
+      console.error("Échec du téléversement du document:", error)
+      setErrors({ submit: error.response?.data?.message || "Échec du téléversement du document" })
     } finally {
       setLoading(false)
     }
   }
 
-  return (
-    <Modal title="Upload Document" onClose={() => onClose(false)}>
-      <form onSubmit={handleSubmit}>
+return (
+  <Modal title="Téléverser un document" onClose={() => onClose(false)}>
+    <div className="bg-indigo-200 hover:bg-indigo-500 rounded-lg p-4 border border-blue-100">
+      <form onSubmit={handleSubmit} className="space-y-4">
         {errors.submit && (
-          <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">{errors.submit}</div>
+          <div className="bg-red-100 border-l-4 border-red-400 text-red-700 px-3 py-2 rounded-r text-sm">
+            {errors.submit}
+          </div>
         )}
 
-        <div className="space-y-4">
+        {/* File Upload Section */}
+        <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+          <div className="flex items-center mb-3">
+            <div className="w-1 h-5 bg-blue-500 rounded-full mr-2"></div>
+            <h3 className="text-sm font-semibold text-gray-800">Fichier</h3>
+          </div>
+          
           <div>
-            <label className="block text-sm font-medium text-gray-700">File *</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">Fichier *</label>
             <div
-              className={`mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md ${
-                errors.file ? "border-red-300" : "border-gray-300"
-              } hover:border-gray-400 cursor-pointer`}
+              className={`mt-1 flex justify-center px-6 pt-5 pb-6 border-2 rounded-md cursor-pointer ${
+                errors.file 
+                  ? "border-red-300 bg-red-50 hover:border-red-400" 
+                  : "border-gray-200 bg-gray-50 hover:border-gray-300"
+              }`}
               onClick={() => fileInputRef.current?.click()}
             >
               <div className="space-y-1 text-center">
                 <DocumentIcon className="mx-auto h-12 w-12 text-gray-400" />
                 <div className="flex text-sm text-gray-600">
-                  <label className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none">
-                    <span>Upload a file</span>
+                  <label className="relative cursor-pointer rounded-md font-medium text-blue-600 hover:text-blue-500">
+                    <span>Téléverser un fichier</span>
                     <input
                       ref={fileInputRef}
                       type="file"
@@ -109,125 +121,195 @@ export default function DocumentUploadModal({ clients, projects, documentTypes, 
                       accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.xls,.xlsx,.dwg"
                     />
                   </label>
-                  <p className="pl-1">or drag and drop</p>
+                  <p className="pl-1">ou glisser-déposer</p>
                 </div>
-                <p className="text-xs text-gray-500">PDF, Word, Excel, Images up to 50MB</p>
+                <p className="text-xs text-gray-500">PDF, Word, Excel, Images jusqu'à 50MB</p>
               </div>
             </div>
             {selectedFile && (
               <p className="mt-2 text-sm text-gray-600">
-                Selected: <span className="font-medium">{selectedFile.name}</span> (
+                Sélectionné : <span className="font-medium">{selectedFile.name}</span> (
                 {(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
               </p>
             )}
-            {errors.file && <p className="mt-1 text-sm text-red-600">{errors.file}</p>}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Document Type *</label>
-            <select
-              name="type"
-              value={formData.type}
-              onChange={handleChange}
-              className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${
-                errors.type ? "border-red-300" : ""
-              }`}
-            >
-              {documentTypes.map((type) => (
-                <option key={type.value} value={type.value}>
-                  {type.label}
-                </option>
-              ))}
-            </select>
-            {errors.type && <p className="mt-1 text-sm text-red-600">{errors.type}</p>}
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Client</label>
-              <select
-                name="clientId"
-                value={formData.clientId}
-                onChange={handleChange}
-                className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${
-                  errors.clientId ? "border-red-300" : ""
-                }`}
-              >
-                <option value="">Select a client</option>
-                {clients.map((client) => (
-                  <option key={client.id} value={client.id}>
-                    {client.firstName} {client.lastName}
-                  </option>
-                ))}
-              </select>
-              {errors.clientId && <p className="mt-1 text-sm text-red-600">{errors.clientId}</p>}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Project</label>
-              <select
-                name="projectId"
-                value={formData.projectId}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              >
-                <option value="">Select a project</option>
-                {projects.map((project) => (
-                  <option key={project.id} value={project.id}>
-                    {project.title}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Price (MAD)</label>
-            <input
-              type="number"
-              name="price"
-              value={formData.price}
-              onChange={handleChange}
-              min="0"
-              step="0.01"
-              className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${
-                errors.price ? "border-red-300" : ""
-              }`}
-              placeholder="0.00"
-            />
-            {errors.price && <p className="mt-1 text-sm text-red-600">{errors.price}</p>}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Description</label>
-            <textarea
-              name="description"
-              rows={3}
-              value={formData.description}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              placeholder="Add any additional details about this document..."
-            />
+            {errors.file && <p className="mt-1 text-xs text-red-600">{errors.file}</p>}
           </div>
         </div>
 
-        <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+        {/* Document Info */}
+        <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+          <div className="flex items-center mb-3">
+            <div className="w-1 h-5 bg-green-500 rounded-full mr-2"></div>
+            <h3 className="text-sm font-semibold text-gray-800">Informations du document</h3>
+          </div>
+          
+          <div className="space-y-3">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Type de document *</label>
+              <select
+                name="type"
+                value={formData.type}
+                onChange={handleChange}
+                className={`w-full px-3 py-2 text-sm rounded-md border-2 transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/20 ${
+                  errors.type 
+                    ? "border-red-300 bg-red-50 focus:border-red-500" 
+                    : "border-gray-200 bg-gray-50 focus:border-blue-500 focus:bg-white"
+                }`}
+              >
+                {documentTypes.map((type) => (
+                  <option key={type.value} value={type.value}>
+                    {type.label}
+                  </option>
+                ))}
+              </select>
+              {errors.type && <p className="mt-1 text-xs text-red-600">{errors.type}</p>}
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Client *</label>
+                <Select
+                  options={clients.map(client => ({
+                    value: client.id,
+                    label: `${client.firstName} ${client.lastName}`
+                  }))}
+                  value={formData.clientId ? {
+                    value: formData.clientId,
+                    label: `${clients.find(c => c.id === formData.clientId)?.firstName || ''} ${clients.find(c => c.id === formData.clientId)?.lastName || ''}`
+                  } : null}
+                  onChange={(selectedOption) => {
+                    const event = {
+                      target: {
+                        name: "clientId",
+                        value: selectedOption?.value || ""
+                      }
+                    };
+                    handleChange(event);
+                  }}
+                  isClearable
+                  placeholder="Sélectionner un client"
+                  classNamePrefix="select"
+                  styles={{
+                    control: (provided, state) => ({
+                      ...provided,
+                      borderColor: errors.clientId ? '#fca5a5' : '#d1d5db',
+                      backgroundColor: errors.clientId ? '#fef2f2' : '#f9fafb',
+                      '&:hover': {
+                        borderColor: errors.clientId ? '#fca5a5' : '#d1d5db'
+                      },
+                      minHeight: '38px',
+                      borderRadius: '6px',
+                      borderWidth: '2px',
+                      boxShadow: 'none',
+                      '&:focus-within': {
+                        borderColor: errors.clientId ? '#ef4444' : '#3b82f6',
+                        backgroundColor: '#fff',
+                        boxShadow: '0 0 0 1px rgba(59, 130, 246, 0.2)'
+                      }
+                    })
+                  }}
+                />
+                {errors.clientId && <p className="mt-1 text-xs text-red-600">{errors.clientId}</p>}
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Projet</label>
+                <Select
+                  options={projects.map(project => ({
+                    value: project.id,
+                    label: project.title
+                  }))}
+                  value={formData.projectId ? {
+                    value: formData.projectId,
+                    label: projects.find(p => p.id === formData.projectId)?.title || ''
+                  } : null}
+                  onChange={(selectedOption) => {
+                    const event = {
+                      target: {
+                        name: "projectId",
+                        value: selectedOption?.value || ""
+                      }
+                    };
+                    handleChange(event);
+                  }}
+                  isClearable
+                  placeholder="Sélectionner un projet"
+                  classNamePrefix="select"
+                  styles={{
+                    control: (provided) => ({
+                      ...provided,
+                      borderColor: '#d1d5db',
+                      backgroundColor: '#f9fafb',
+                      '&:hover': {
+                        borderColor: '#d1d5db'
+                      },
+                      minHeight: '38px',
+                      borderRadius: '6px',
+                      borderWidth: '2px',
+                      boxShadow: 'none',
+                      '&:focus-within': {
+                        borderColor: '#3b82f6',
+                        backgroundColor: '#fff',
+                        boxShadow: '0 0 0 1px rgba(59, 130, 246, 0.2)'
+                      }
+                    })
+                  }}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Prix (MAD)</label>
+              <input
+                type="number"
+                name="price"
+                value={formData.price}
+                onChange={handleChange}
+                min="0"
+                step="0.01"
+                className={`w-full px-3 py-2 text-sm rounded-md border-2 transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/20 ${
+                  errors.price 
+                    ? "border-red-300 bg-red-50 focus:border-red-500" 
+                    : "border-gray-200 bg-gray-50 focus:border-blue-500 focus:bg-white"
+                }`}
+                placeholder="0.00"
+              />
+              {errors.price && <p className="mt-1 text-xs text-red-600">{errors.price}</p>}
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Description</label>
+              <textarea
+                name="description"
+                rows={3}
+                value={formData.description}
+                onChange={handleChange}
+                className="w-full px-3 py-2 text-sm rounded-md border-2 border-gray-200 bg-gray-50 transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white resize-none"
+                placeholder="Ajoutez des détails supplémentaires sur ce document..."
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Buttons */}
+        <div className="flex flex-col sm:flex-row-reverse gap-2 pt-3 border-t border-gray-200">
           <button
             type="submit"
             disabled={loading}
-            className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50"
+            className="px-4 py-2 bg-green-500 text-black text-sm font-semibold rounded-md shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200 disabled:opacity-50"
           >
-            {loading ? "Uploading..." : "Upload"}
+            {loading ? "Téléversement..." : "Téléverser"}
           </button>
           <button
             type="button"
             onClick={() => onClose(false)}
-            className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+            className="px-4 py-2 bg-white text-gray-700 text-sm font-semibold rounded-md border-2 border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-1 transition-colors"
           >
-            Cancel
+            Annuler
           </button>
         </div>
       </form>
-    </Modal>
-  )
+    </div>
+  </Modal>
+)
 }

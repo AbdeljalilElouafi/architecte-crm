@@ -18,7 +18,7 @@ export default function Dashboard() {
       const response = await dashboardAPI.getStats()
       setStats(response.data)
     } catch (error) {
-      console.error("Failed to fetch dashboard stats:", error)
+      console.error("Échec de la récupération des statistiques du tableau de bord:", error)
     } finally {
       setLoading(false)
     }
@@ -34,28 +34,28 @@ export default function Dashboard() {
 
   const overviewCards = [
     {
-      name: "Total Clients",
+      name: "Clients totaux",
       value: stats?.overview?.totalClients || 0,
       icon: UsersIcon,
       color: "bg-blue-500",
       href: "/clients",
     },
     {
-      name: "Active Projects",
+      name: "Projets actifs",
       value: stats?.overview?.activeProjects || 0,
       icon: FolderIcon,
       color: "bg-green-500",
       href: "/projects",
     },
     {
-      name: "Total Revenue",
+      name: "Revenu total",
       value: `${(stats?.overview?.totalRevenue || 0).toLocaleString()} MAD`,
       icon: CurrencyDollarIcon,
       color: "bg-yellow-500",
       href: "/payments",
     },
     {
-      name: "Monthly Revenue",
+      name: "Revenu mensuel",
       value: `${(stats?.overview?.monthlyRevenue || 0).toLocaleString()} MAD`,
       icon: CurrencyDollarIcon,
       color: "bg-purple-500",
@@ -67,8 +67,8 @@ export default function Dashboard() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="mt-1 text-sm text-gray-500">Welcome back! Here's what's happening with your projects.</p>
+        <h1 className="text-2xl font-bold text-gray-900">Tableau de bord</h1>
+        <p className="mt-1 text-sm text-gray-500">Bienvenue ! Voici ce qui se passe avec vos projets.</p>
       </div>
 
       {/* Overview Cards */}
@@ -77,7 +77,7 @@ export default function Dashboard() {
           <Link
             key={card.name}
             to={card.href}
-            className="relative bg-white pt-5 px-4 pb-12 sm:pt-6 sm:px-6 shadow rounded-lg overflow-hidden hover:shadow-md transition-shadow"
+            className="relative bg-white pt-5 px-4  sm:pt-6 sm:px-6 shadow rounded-lg overflow-hidden hover:shadow-md transition-shadow"
           >
             <dt>
               <div className={`absolute ${card.color} rounded-md p-3`}>
@@ -92,35 +92,14 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* Alerts */}
-      {stats?.alerts?.overdueProjects?.length > 0 && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
-          <div className="flex">
-            <ExclamationTriangleIcon className="h-5 w-5 text-yellow-400" />
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-yellow-800">Projects with Outstanding Payments</h3>
-              <div className="mt-2 text-sm text-yellow-700">
-                <ul className="list-disc pl-5 space-y-1">
-                  {stats.alerts.overdueProjects.slice(0, 3).map((project) => (
-                    <li key={project.id}>
-                      <Link to={`/projects/${project.id}`} className="hover:underline">
-                        {project.title} - {project.client?.firstName} {project.client?.lastName}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+
 
       {/* Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Projects */}
         <div className="bg-white shadow rounded-lg">
           <div className="px-4 py-5 sm:p-6">
-            <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">Recent Projects</h3>
+            <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">Projets récents</h3>
             <div className="space-y-3">
               {stats?.recentActivity?.projects?.slice(0, 5).map((project) => (
                 <div key={project.id} className="flex items-center justify-between">
@@ -144,14 +123,16 @@ export default function Dashboard() {
                           : "bg-gray-100 text-gray-800"
                     }`}
                   >
-                    {project.status.replace("_", " ")}
+                    {project.status === 'completed' && 'Terminé'}
+                    {project.status === 'in_progress' && 'En cours'}
+                    {project.status === 'planning' && 'Planification'}
                   </span>
                 </div>
               ))}
             </div>
             <div className="mt-4">
               <Link to="/projects" className="text-sm text-blue-600 hover:text-blue-500">
-                View all projects →
+                Voir tous les projets →
               </Link>
             </div>
           </div>
@@ -160,7 +141,7 @@ export default function Dashboard() {
         {/* Recent Payments */}
         <div className="bg-white shadow rounded-lg">
           <div className="px-4 py-5 sm:p-6">
-            <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">Recent Payments</h3>
+            <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">Paiements récents</h3>
             <div className="space-y-3">
               {stats?.recentActivity?.payments?.slice(0, 5).map((payment) => (
                 <div key={payment.id} className="flex items-center justify-between">
@@ -172,36 +153,22 @@ export default function Dashboard() {
                   </div>
                   <div className="text-right">
                     <p className="text-sm font-medium text-green-600">+{payment.amount.toLocaleString()} MAD</p>
-                    <p className="text-xs text-gray-500">{new Date(payment.paymentDate).toLocaleDateString()}</p>
+                    <p className="text-xs text-gray-500">
+                      {new Date(payment.paymentDate).toLocaleDateString('fr-FR')}
+                    </p>
                   </div>
                 </div>
               ))}
             </div>
             <div className="mt-4">
               <Link to="/payments" className="text-sm text-blue-600 hover:text-blue-500">
-                View all payments →
+                Voir tous les paiements →
               </Link>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Project Status Chart */}
-      {stats?.charts?.statusDistribution && (
-        <div className="bg-white shadow rounded-lg">
-          <div className="px-4 py-5 sm:p-6">
-            <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">Project Status Distribution</h3>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-              {Object.entries(stats.charts.statusDistribution).map(([status, count]) => (
-                <div key={status} className="text-center">
-                  <div className="text-2xl font-bold text-gray-900">{count}</div>
-                  <div className="text-sm text-gray-500 capitalize">{status.replace("_", " ")}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

@@ -1,33 +1,36 @@
-const { Client, Project, Payment, Document } = require("../models")
-const { Op, sequelize } = require("sequelize")
+const { User, Project, Client, Payment } = require("../models")
+const { Op } = require("sequelize")
 
-const getDashboardStats = async (req, res) => {
+const getStats = async (req, res) => {
   try {
-    // Get current date for filtering
+    // Get current date for monthly calculations
     const now = new Date()
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
     const startOfYear = new Date(now.getFullYear(), 0, 1)
 
-    // Total counts
-    const totalClients = await Client.count({ where: { status: "active" } })
-    const totalProjects = await Project.count()
-    const activeProjects = await Project.count({
-      where: { status: { [Op.in]: ["planning", "in_progress"] } },
-    })
-    const completedProjects = await Project.count({ where: { status: "completed" } })
+    // Overview stats
+    const totalClients = await Client.count()
 
-    // Financial stats
-    const totalRevenue = await Payment.sum("amount", {
-      where: { status: "completed" },
-    })
-    const monthlyRevenue = await Payment.sum("amount", {
+    const activeProjects = await Project.count({
       where: {
-        status: "completed",
-        paymentDate: { [Op.gte]: startOfMonth },
+        status: {
+          [Op.in]: ["planning", "in_progress", "review"],
+        },
       },
     })
 
-    // Recent activities
+    const totalRevenue = (await Payment.sum("amount")) || 0
+
+    const monthlyRevenue =
+      (await Payment.sum("amount", {
+        where: {
+          paymentDate: {
+            [Op.gte]: startOfMonth,
+          },
+        },
+      })) || 0
+
+    // Recent activity
     const recentProjects = await Project.findAll({
       limit: 5,
       order: [["createdAt", "DESC"]],
@@ -43,7 +46,6 @@ const getDashboardStats = async (req, res) => {
     const recentPayments = await Payment.findAll({
       limit: 5,
       order: [["paymentDate", "DESC"]],
-      where: { status: "completed" },
       include: [
         {
           model: Project,
@@ -60,28 +62,23 @@ const getDashboardStats = async (req, res) => {
       ],
     })
 
-    const recentDocuments = await Document.findAll({
-      limit: 5,
-      order: [["createdAt", "DESC"]],
-      include: [
-        {
-          model: Client,
-          as: "client",
-          attributes: ["firstName", "lastName"],
-        },
-        {
-          model: Project,
-          as: "project",
-          attributes: ["title"],
-        },
-      ],
+    // Status distribution
+    const statusDistribution = await Project.findAll({
+      attributes: ["status", [Project.sequelize.fn("COUNT", Project.sequelize.col("status")), "count"]],
+      group: ["status"],
     })
 
-    // Overdue payments (projects with remaining balance and no recent payments)
+    const statusCounts = {}
+    statusDistribution.forEach((item) => {
+      statusCounts[item.status] = Number.parseInt(item.dataValues.count)
+    })
+
+    // Overdue projects (projects with unpaid invoices past due date)
     const overdueProjects = await Project.findAll({
       where: {
-        status: { [Op.in]: ["planning", "in_progress"] },
-        totalPrice: { [Op.gt]: 0 },
+        status: {
+          [Op.ne]: "completed",
+        },
       },
       include: [
         {
@@ -89,83 +86,74 @@ const getDashboardStats = async (req, res) => {
           as: "client",
           attributes: ["firstName", "lastName"],
         },
-        {
-          model: Payment,
-          as: "payments",
-          where: { status: "completed" },
-          required: false,
-        },
       ],
+      // You might want to add more complex logic here based on your payment structure
+      limit: 10,
     })
 
-    // Filter projects with remaining balance
-    const projectsWithBalance = overdueProjects.filter((project) => {
-      const totalPaid = project.payments.reduce((sum, payment) => sum + Number.parseFloat(payment.amount), 0)
-      const remainingBalance = Number.parseFloat(project.totalPrice) - totalPaid
-      return remainingBalance > 0
-    })
-
-    // Project status distribution
-    const projectsByStatus = await Project.findAll({
-      attributes: ["status", [sequelize.fn("COUNT", sequelize.col("id")), "count"]],
-      group: ["status"],
-    })
-
-    const statusDistribution = projectsByStatus.reduce((acc, item) => {
-      acc[item.status] = Number.parseInt(item.dataValues.count)
-      return acc
-    }, {})
-
-    // Monthly revenue trend (last 6 months)
-    const monthlyTrend = []
-    for (let i = 5; i >= 0; i--) {
-      const monthStart = new Date(now.getFullYear(), now.getMonth() - i, 1)
-      const monthEnd = new Date(now.getFullYear(), now.getMonth() - i + 1, 0)
-
-      const monthRevenue = await Payment.sum("amount", {
-        where: {
-          status: "completed",
-          paymentDate: {
-            [Op.between]: [monthStart, monthEnd],
-          },
-        },
-      })
-
-      monthlyTrend.push({
-        month: monthStart.toLocaleDateString("en-US", { month: "short", year: "numeric" }),
-        revenue: Number.parseFloat(monthRevenue) || 0,
-      })
-    }
-
-    res.json({
+    const stats = {
       overview: {
         totalClients,
-        totalProjects,
         activeProjects,
-        completedProjects,
-        totalRevenue: Number.parseFloat(totalRevenue) || 0,
-        monthlyRevenue: Number.parseFloat(monthlyRevenue) || 0,
+        totalRevenue,
+        monthlyRevenue,
       },
       recentActivity: {
         projects: recentProjects,
         payments: recentPayments,
-        documents: recentDocuments,
-      },
-      alerts: {
-        overdueProjects: projectsWithBalance.slice(0, 5),
-        projectsNeedingAttention: activeProjects,
       },
       charts: {
-        statusDistribution,
-        monthlyTrend,
+        statusDistribution: statusCounts,
       },
-    })
+      alerts: {
+        overdueProjects: overdueProjects.slice(0, 5), // Show only first 5
+      },
+    }
+
+    res.json(stats)
   } catch (error) {
-    console.error("Get dashboard stats error:", error)
-    res.status(500).json({ message: "Internal server error" })
+    console.error("Dashboard stats error:", error)
+    res.status(500).json({ message: "Erreur lors de la récupération des statistiques" })
+  }
+}
+
+const getMonthlyRevenue = async (req, res) => {
+  try {
+    const { year = new Date().getFullYear() } = req.query
+
+    const monthlyData = await Payment.findAll({
+      attributes: [
+        [Payment.sequelize.fn("MONTH", Payment.sequelize.col("paymentDate")), "month"],
+        [Payment.sequelize.fn("SUM", Payment.sequelize.col("amount")), "total"],
+      ],
+      where: {
+        paymentDate: {
+          [Op.between]: [new Date(year, 0, 1), new Date(year, 11, 31)],
+        },
+      },
+      group: [Payment.sequelize.fn("MONTH", Payment.sequelize.col("paymentDate"))],
+      order: [[Payment.sequelize.fn("MONTH", Payment.sequelize.col("paymentDate")), "ASC"]],
+    })
+
+    // Fill in missing months with 0
+    const months = Array.from({ length: 12 }, (_, i) => ({
+      month: i + 1,
+      total: 0,
+    }))
+
+    monthlyData.forEach((item) => {
+      const monthIndex = Number.parseInt(item.dataValues.month) - 1
+      months[monthIndex].total = Number.parseFloat(item.dataValues.total) || 0
+    })
+
+    res.json(months)
+  } catch (error) {
+    console.error("Monthly revenue error:", error)
+    res.status(500).json({ message: "Erreur lors de la récupération des revenus mensuels" })
   }
 }
 
 module.exports = {
-  getDashboardStats,
+  getStats,
+  getMonthlyRevenue,
 }

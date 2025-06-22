@@ -1,11 +1,10 @@
 const express = require("express")
-const { getDashboardStats } = require("../controllers/dashboardController")
+const { getStats, getMonthlyRevenue } = require("../controllers/dashboardController")
 const { authenticateToken } = require("../middleware/auth")
 
 const router = express.Router()
 
-router.use(authenticateToken)
-
-router.get("/stats", getDashboardStats)
+router.get("/stats", authenticateToken, getStats)
+router.get("/monthly-revenue", authenticateToken, getMonthlyRevenue)
 
 module.exports = router

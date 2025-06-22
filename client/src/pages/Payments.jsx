@@ -15,6 +15,7 @@ import {
 import { paymentsAPI, projectsAPI } from "../services/api.jsx"
 import PaymentModal from "../components/Payments/PaymentModal"
 import DeleteConfirmModal from "../components/Common/DeleteConfirmModal"
+import Select from "react-select"
 
 export default function Payments() {
   const [payments, setPayments] = useState([])
@@ -54,7 +55,7 @@ export default function Payments() {
       setPayments(response.data.payments)
       setTotalPages(response.data.totalPages)
     } catch (error) {
-      console.error("Failed to fetch payments:", error)
+      console.error("Échec de la récupération des paiements:", error)
     } finally {
       setLoading(false)
     }
@@ -65,7 +66,7 @@ export default function Payments() {
       const response = await projectsAPI.getAll({ limit: 100 })
       setProjects(response.data.projects)
     } catch (error) {
-      console.error("Failed to fetch projects:", error)
+      console.error("Échec de la récupération des projets:", error)
     }
   }
 
@@ -79,7 +80,7 @@ export default function Payments() {
       const response = await paymentsAPI.getStats(params)
       setStats(response.data)
     } catch (error) {
-      console.error("Failed to fetch payment stats:", error)
+      console.error("Échec de la récupération des statistiques de paiement:", error)
     }
   }
 
@@ -104,7 +105,7 @@ export default function Payments() {
       fetchPayments()
       fetchPaymentStats()
     } catch (error) {
-      console.error("Failed to delete payment:", error)
+      console.error("Échec de la suppression du paiement:", error)
     }
   }
 
@@ -158,15 +159,15 @@ export default function Payments() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Payments</h1>
-          <p className="mt-1 text-sm text-gray-500">Track and manage project payments</p>
+          <h1 className="text-2xl font-bold text-gray-900">Paiements</h1>
+          <p className="mt-1 text-sm text-gray-500">Suivez et gérez les paiements des projets</p>
         </div>
         <button
           onClick={handleCreatePayment}
           className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         >
           <PlusIcon className="h-4 w-4 mr-2" />
-          Add Payment
+          Ajouter un paiement
         </button>
       </div>
 
@@ -179,7 +180,7 @@ export default function Payments() {
                 <CurrencyDollarIcon className="h-6 w-6 text-blue-600" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">Total Payments</p>
+                <p className="text-sm font-medium text-gray-500">Total des paiements</p>
                 <p className="text-lg font-semibold text-gray-900">{stats.total.count}</p>
               </div>
             </div>
@@ -190,7 +191,7 @@ export default function Payments() {
                 <CurrencyDollarIcon className="h-6 w-6 text-green-600" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">Total Amount</p>
+                <p className="text-sm font-medium text-gray-500">Montant total</p>
                 <p className="text-lg font-semibold text-gray-900">{stats.total.totalAmount.toLocaleString()} MAD</p>
               </div>
             </div>
@@ -202,7 +203,7 @@ export default function Payments() {
                   <CurrencyDollarIcon className="h-6 w-6 text-green-600" />
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500">Cash Payments</p>
+                  <p className="text-sm font-medium text-gray-500">Paiements en espèces</p>
                   <p className="text-lg font-semibold text-gray-900">
                     {stats.byMethod.cash.totalAmount.toLocaleString()} MAD
                   </p>
@@ -217,7 +218,7 @@ export default function Payments() {
                   <CurrencyDollarIcon className="h-6 w-6 text-purple-600" />
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500">Bank Transfers</p>
+                  <p className="text-sm font-medium text-gray-500">Virements bancaires</p>
                   <p className="text-lg font-semibold text-gray-900">
                     {stats.byMethod.bank_transfer.totalAmount.toLocaleString()} MAD
                   </p>
@@ -232,10 +233,10 @@ export default function Payments() {
       <div className="bg-white p-4 rounded-lg shadow">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="relative">
-            <MagnifyingGlassIcon className="h-5 w-5 absolute left-3 top-3 text-gray-400" />
+            <MagnifyingGlassIcon className="h-5 w-5 absolute left-1 top-1 text-gray-400" />
             <input
               type="text"
-              placeholder="Search payments..."
+              placeholder="Rechercher des paiements..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
@@ -246,28 +247,53 @@ export default function Payments() {
             onChange={(e) => setMethodFilter(e.target.value)}
             className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
           >
-            <option value="">All Payment Methods</option>
-            <option value="cash">Cash</option>
-            <option value="check">Check</option>
-            <option value="bank_transfer">Bank Transfer</option>
-            <option value="card">Card</option>
+            <option value="">Toutes les méthodes</option>
+            <option value="cash">Espèces</option>
+            <option value="check">Chèque</option>
+            <option value="bank_transfer">Virement bancaire</option>
+            <option value="card">Carte</option>
           </select>
-          <select
-            value={projectFilter}
-            onChange={(e) => setProjectFilter(e.target.value)}
-            className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          >
-            <option value="">All Projects</option>
-            {projects.map((project) => (
-              <option key={project.id} value={project.id}>
-                {project.title}
-              </option>
-            ))}
-          </select>
+          <Select
+              options={[
+                { value: '', label: 'Tous les projets' },
+                ...projects.map(project => ({
+                  value: project.id,
+                  label: project.title
+                }))
+              ]}
+              value={
+                projectFilter
+                  ? {
+                      value: projectFilter,
+                      label: projects.find(p => p.id === projectFilter)?.title || 'Tous les projets'
+                    }
+                  : { value: '', label: 'Tous les projets' }
+              }
+              onChange={(selectedOption) => setProjectFilter(selectedOption?.value || '')}
+              isClearable={false}
+              className="mt-1"
+              classNamePrefix="select"
+              styles={{
+                control: (provided) => ({
+                  ...provided,
+                  borderRadius: '0.375rem',
+                  borderColor: '#d1d5db',
+                  boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+                  '&:hover': {
+                    borderColor: '#d1d5db'
+                  },
+                  '&:focus-within': {
+                    borderColor: '#3b82f6',
+                    ring: '0 0 0 1px #3b82f6'
+                  },
+                  minHeight: '38px'
+                })
+              }}
+            />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Start Date</label>
+            <label className="block text-sm font-medium text-gray-700">Date de début</label>
             <input
               type="date"
               name="startDate"
@@ -277,7 +303,7 @@ export default function Payments() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">End Date</label>
+            <label className="block text-sm font-medium text-gray-700">Date de fin</label>
             <input
               type="date"
               name="endDate"
@@ -294,15 +320,15 @@ export default function Payments() {
         {payments.length === 0 ? (
           <div className="p-6 text-center">
             <CurrencyDollarIcon className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No payments found</h3>
-            <p className="mt-1 text-sm text-gray-500">Get started by adding a new payment.</p>
+            <h3 className="mt-2 text-sm font-medium text-gray-900">Aucun paiement trouvé</h3>
+            <p className="mt-1 text-sm text-gray-500">Commencez par ajouter un nouveau paiement.</p>
             <div className="mt-6">
               <button
                 onClick={handleCreatePayment}
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
                 <PlusIcon className="h-4 w-4 mr-2" />
-                Add Payment
+                Ajouter un paiement
               </button>
             </div>
           </div>
@@ -312,19 +338,19 @@ export default function Payments() {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Project
+                    Projet
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Amount
+                    Montant
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Method
+                    Méthode
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Date
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
+                    Statut
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
@@ -351,19 +377,26 @@ export default function Payments() {
                           payment.method,
                         )}`}
                       >
-                        {payment.method.replace("_", " ")}
+                        {payment.method === 'cash' && 'Espèces'}
+                        {payment.method === 'check' && 'Chèque'}
+                        {payment.method === 'bank_transfer' && 'Virement bancaire'}
+                        {payment.method === 'card' && 'Carte'}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       <div className="flex items-center">
                         <CalendarIcon className="h-4 w-4 mr-1 text-gray-400" />
-                        {new Date(payment.paymentDate).toLocaleDateString()}
+                        {new Date(payment.paymentDate).toLocaleDateString('fr-FR')}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         {getStatusIcon(payment.status)}
-                        <span className="ml-1 text-sm text-gray-500">{payment.status}</span>
+                        <span className="ml-1 text-sm text-gray-500">
+                          {payment.status === 'completed' && 'Terminé'}
+                          {payment.status === 'pending' && 'En attente'}
+                          {payment.status === 'failed' && 'Échoué'}
+                        </span>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -371,14 +404,14 @@ export default function Payments() {
                         <button
                           onClick={() => handleEditPayment(payment)}
                           className="text-indigo-600 hover:text-indigo-900"
-                          title="Edit"
+                          title="Modifier"
                         >
                           <PencilIcon className="h-4 w-4" />
                         </button>
                         <button
                           onClick={() => handleDeletePayment(payment)}
                           className="text-red-600 hover:text-red-900"
-                          title="Delete"
+                          title="Supprimer"
                         >
                           <TrashIcon className="h-4 w-4" />
                         </button>
@@ -398,20 +431,20 @@ export default function Payments() {
                     disabled={currentPage === 1}
                     className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
                   >
-                    Previous
+                    Précédent
                   </button>
                   <button
                     onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                     disabled={currentPage === totalPages}
                     className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
                   >
-                    Next
+                    Suivant
                   </button>
                 </div>
                 <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                   <div>
                     <p className="text-sm text-gray-700">
-                      Page <span className="font-medium">{currentPage}</span> of{" "}
+                      Page <span className="font-medium">{currentPage}</span> sur{" "}
                       <span className="font-medium">{totalPages}</span>
                     </p>
                   </div>
@@ -444,8 +477,8 @@ export default function Payments() {
 
       {deleteModal.show && (
         <DeleteConfirmModal
-          title="Delete Payment"
-          message={`Are you sure you want to delete this payment of ${deleteModal.payment?.amount.toLocaleString()} MAD? This action cannot be undone.`}
+          title="Supprimer le Paiement"
+          message={`Êtes-vous sûr de vouloir supprimer ce paiement de ${deleteModal.payment?.amount.toLocaleString()} MAD ? Cette action est irréversible.`}
           onConfirm={confirmDelete}
           onCancel={() => setDeleteModal({ show: false, payment: null })}
         />

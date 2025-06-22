@@ -43,11 +43,11 @@ export default function ClientModal({ client, onClose }) {
 
   const validateForm = () => {
     const newErrors = {}
-    if (!formData.firstName.trim()) newErrors.firstName = "First name is required"
-    if (!formData.lastName.trim()) newErrors.lastName = "Last name is required"
-    if (!formData.email.trim()) newErrors.email = "Email is required"
-    if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Email is invalid"
-    if (!formData.cin.trim()) newErrors.cin = "CIN is required"
+    if (!formData.firstName.trim()) newErrors.firstName = "Le prénom est requis"
+    if (!formData.lastName.trim()) newErrors.lastName = "Le nom est requis"
+    if (!formData.email.trim()) newErrors.email = "L'email est requis"
+    if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "L'email est invalide"
+    if (!formData.cin.trim()) newErrors.cin = "Le CIN est requis"
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -66,144 +66,192 @@ export default function ClientModal({ client, onClose }) {
       }
       onClose(true)
     } catch (error) {
-      console.error("Failed to save client:", error)
-      setErrors({ submit: error.response?.data?.message || "Failed to save client" })
+      console.error("Échec de l'enregistrement du client:", error)
+      setErrors({ submit: error.response?.data?.message || "Échec de l'enregistrement du client" })
     } finally {
       setLoading(false)
     }
   }
 
-  return (
-    <Modal title={client ? "Edit Client" : "Add New Client"} onClose={() => onClose(false)}>
-      <form onSubmit={handleSubmit}>
+return (
+  <Modal title={client ? "Modifier le client" : "Ajouter un nouveau client"} onClose={() => onClose(false)}>
+    <div className="bg-indigo-200 hover:bg-indigo-500 rounded-lg p-4 border border-blue-100">
+      <form onSubmit={handleSubmit} className="space-y-4">
         {errors.submit && (
-          <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">{errors.submit}</div>
+          <div className="bg-red-100 border-l-4 border-red-400 text-red-700 px-3 py-2 rounded-r text-sm">
+            {errors.submit}
+          </div>
         )}
 
-        <div className="space-y-4">
+        {/* Personal Info */}
+        <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+          <div className="flex items-center mb-3">
+            <div className="w-1 h-5 bg-blue-500 rounded-full mr-2"></div>
+            <h3 className="text-sm font-semibold text-gray-800">Informations personnelles</h3>
+          </div>
+          
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">First Name *</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Prénom *</label>
               <input
                 type="text"
                 name="firstName"
                 value={formData.firstName}
                 onChange={handleChange}
-                className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${
-                  errors.firstName ? "border-red-300" : ""
+                placeholder="Entrez le prénom"
+                className={`w-full px-3 py-2 text-sm rounded-md border-2 transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/20 ${
+                  errors.firstName 
+                    ? "border-red-300 bg-red-50 focus:border-red-500" 
+                    : "border-gray-200 bg-gray-50 focus:border-blue-500 focus:bg-white"
                 }`}
               />
-              {errors.firstName && <p className="mt-1 text-sm text-red-600">{errors.firstName}</p>}
+              {errors.firstName && <p className="mt-1 text-xs text-red-600">{errors.firstName}</p>}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">Last Name *</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Nom *</label>
               <input
                 type="text"
                 name="lastName"
                 value={formData.lastName}
                 onChange={handleChange}
-                className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${
-                  errors.lastName ? "border-red-300" : ""
+                placeholder="Entrez le nom"
+                className={`w-full px-3 py-2 text-sm rounded-md border-2 transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/20 ${
+                  errors.lastName 
+                    ? "border-red-300 bg-red-50 focus:border-red-500" 
+                    : "border-gray-200 bg-gray-50 focus:border-blue-500 focus:bg-white"
                 }`}
               />
-              {errors.lastName && <p className="mt-1 text-sm text-red-600">{errors.lastName}</p>}
+              {errors.lastName && <p className="mt-1 text-xs text-red-600">{errors.lastName}</p>}
+            </div>
+          </div>
+        </div>
+
+        {/* Contact & Legal Info */}
+        <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+          <div className="flex items-center mb-3">
+            <div className="w-1 h-5 bg-green-500 rounded-full mr-2"></div>
+            <h3 className="text-sm font-semibold text-gray-800">Contact & informations légales</h3>
+          </div>
+          
+          <div className="space-y-3">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Email *</label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="exemple@email.com"
+                className={`w-full px-3 py-2 text-sm rounded-md border-2 transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/20 ${
+                  errors.email 
+                    ? "border-red-300 bg-red-50 focus:border-red-500" 
+                    : "border-gray-200 bg-gray-50 focus:border-blue-500 focus:bg-white"
+                }`}
+              />
+              {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email}</p>}
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Téléphone</label>
+                <input
+                  type="tel"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  placeholder="+212 6XX XXX XXX"
+                  className="w-full px-3 py-2 text-sm rounded-md border-2 border-gray-200 bg-gray-50 transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">CIN *</label>
+                <input
+                  type="text"
+                  name="cin"
+                  value={formData.cin}
+                  onChange={handleChange}
+                  placeholder="XX123456"
+                  className={`w-full px-3 py-2 text-sm rounded-md border-2 transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/20 ${
+                    errors.cin 
+                      ? "border-red-300 bg-red-50 focus:border-red-500" 
+                      : "border-gray-200 bg-gray-50 focus:border-blue-500 focus:bg-white"
+                  }`}
+                />
+                {errors.cin && <p className="mt-1 text-xs text-red-600">{errors.cin}</p>}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Additional Info */}
+        <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+          <div className="flex items-center mb-3">
+            <div className="w-1 h-5 bg-orange-500 rounded-full mr-2"></div>
+            <h3 className="text-sm font-semibold text-gray-800">Informations additionnelles</h3>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Statut</label>
+              <select
+                name="status"
+                value={formData.status}
+                onChange={handleChange}
+                className="w-full px-3 py-2 text-sm rounded-md border-2 border-gray-200 bg-gray-50 transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white"
+              >
+                <option value="active">🟢 Actif</option>
+                <option value="inactive">🟡 Inactif</option>
+                <option value="archived">🔴 Archivé</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Adresse</label>
+              <textarea
+                name="address"
+                rows={2}
+                value={formData.address}
+                onChange={handleChange}
+                placeholder="Adresse..."
+                className="w-full px-3 py-2 text-sm rounded-md border-2 border-gray-200 bg-gray-50 transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white resize-none"
+              />
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Email *</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${
-                errors.email ? "border-red-300" : ""
-              }`}
-            />
-            {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Phone</label>
-            <input
-              type="tel"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">CIN *</label>
-            <input
-              type="text"
-              name="cin"
-              value={formData.cin}
-              onChange={handleChange}
-              className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${
-                errors.cin ? "border-red-300" : ""
-              }`}
-            />
-            {errors.cin && <p className="mt-1 text-sm text-red-600">{errors.cin}</p>}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Address</label>
-            <textarea
-              name="address"
-              rows={3}
-              value={formData.address}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Status</label>
-            <select
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            >
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-              <option value="archived">Archived</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Notes</label>
+          <div className="mt-3">
+            <label className="block text-sm font-semibold text-gray-700 mb-1">Notes</label>
             <textarea
               name="notes"
-              rows={3}
+              rows={2}
               value={formData.notes}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              placeholder="Notes ou commentaires..."
+              className="w-full px-3 py-2 text-sm rounded-md border-2 border-gray-200 bg-gray-50 transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white resize-none"
             />
           </div>
         </div>
 
-        <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+        {/* Buttons */}
+        <div className="flex flex-col sm:flex-row-reverse gap-2 pt-3 border-t border-gray-200">
           <button
             type="submit"
             disabled={loading}
-            className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50"
+            className="px-4 py-2 bg-green-500 text-black text-sm font-semibold rounded-md shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200 disabled:opacity-50"
           >
-            {loading ? "Saving..." : client ? "Update" : "Create"}
+            {loading ? "Enregistrement..." : client ? "Mettre à jour" : "Créer"}
           </button>
           <button
             type="button"
             onClick={() => onClose(false)}
-            className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+            className="px-4 py-2 bg-white text-gray-700 text-sm font-semibold rounded-md border-2 border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-1 transition-colors"
           >
-            Cancel
+            Annuler
           </button>
         </div>
       </form>
-    </Modal>
-  )
+    </div>
+  </Modal>
+)
 }

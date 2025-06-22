@@ -16,12 +16,12 @@ import {
 import { useAuth } from "../../hooks/useAuth.jsx"
 
 const navigation = [
-  { name: "Dashboard", href: "/", icon: HomeIcon },
+  { name: "Tableau de bord", href: "/", icon: HomeIcon },
   { name: "Clients", href: "/clients", icon: UsersIcon },
-  { name: "Projects", href: "/projects", icon: FolderIcon },
+  { name: "Projets", href: "/projects", icon: FolderIcon },
   { name: "Documents", href: "/documents", icon: DocumentIcon },
-  { name: "Payments", href: "/payments", icon: CreditCardIcon },
-  { name: "Settings", href: "/settings", icon: Cog6ToothIcon },
+  { name: "Paiements", href: "/payments", icon: CreditCardIcon },
+  { name: "Paramétres", href: "/settings", icon: Cog6ToothIcon },
 ]
 
 export default function Sidebar() {
@@ -56,7 +56,7 @@ export default function Sidebar() {
       <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
         <div className="flex min-h-0 flex-1 flex-col bg-white border-r border-gray-200">
           <div className="flex h-16 items-center px-4 border-b border-gray-200">
-            <h1 className="text-xl font-bold text-gray-900">Architect CRM</h1>
+            <h1 className="text-xl font-bold text-gray-900"> CRM Architect </h1>
           </div>
           <SidebarContent navigation={navigation} isActive={isActive} user={user} logout={logout} />
         </div>
@@ -120,7 +120,7 @@ function SidebarContent({ navigation, isActive, user, logout }) {
           className="mt-3 flex w-full items-center px-2 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md"
         >
           <ArrowLeftOnRectangleIcon className="mr-3 h-5 w-5 text-gray-400" />
-          Sign out
+          Déconnexion
         </button>
       </div>
     </div>

@@ -50,9 +50,9 @@ export default function Settings() {
     try {
       // This would be implemented in a real application
       // await authAPI.updateProfile(profileForm)
-      setSuccess("Profile updated successfully")
+      setSuccess("Profil mis à jour avec succès")
     } catch (error) {
-      setError(error.response?.data?.message || "Failed to update profile")
+      setError(error.response?.data?.message || "Échec de la mise à jour du profil")
     } finally {
       setLoading(false)
     }
@@ -65,7 +65,7 @@ export default function Settings() {
     setSuccess("")
 
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      setError("Passwords do not match")
+      setError("Les mots de passe ne correspondent pas")
       setLoading(false)
       return
     }
@@ -73,32 +73,32 @@ export default function Settings() {
     try {
       // This would be implemented in a real application
       // await authAPI.changePassword(passwordForm)
-      setSuccess("Password changed successfully")
+      setSuccess("Mot de passe modifié avec succès")
       setPasswordForm({
         currentPassword: "",
         newPassword: "",
         confirmPassword: "",
       })
     } catch (error) {
-      setError(error.response?.data?.message || "Failed to change password")
+      setError(error.response?.data?.message || "Échec de la modification du mot de passe")
     } finally {
       setLoading(false)
     }
   }
 
   const tabs = [
-    { id: "profile", name: "Profile", icon: UserIcon },
-    { id: "security", name: "Security", icon: KeyIcon },
+    { id: "profile", name: "Profil", icon: UserIcon },
+    { id: "security", name: "Sécurité", icon: KeyIcon },
     { id: "notifications", name: "Notifications", icon: BellIcon },
-    { id: "preferences", name: "Preferences", icon: GlobeAltIcon },
+    { id: "preferences", name: "Préférences", icon: GlobeAltIcon },
   ]
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-        <p className="mt-1 text-sm text-gray-500">Manage your account settings and preferences</p>
+        <h1 className="text-2xl font-bold text-gray-900">Paramètres</h1>
+        <p className="mt-1 text-sm text-gray-500">Gérez les paramètres de votre compte et vos préférences</p>
       </div>
 
       {/* Tabs */}
@@ -126,7 +126,7 @@ export default function Settings() {
           {/* Profile Settings */}
           {activeTab === "profile" && (
             <div>
-              <h2 className="text-lg font-medium text-gray-900 mb-4">Profile Information</h2>
+              <h2 className="text-lg font-medium text-gray-900 mb-4">Informations du Profil</h2>
               {success && (
                 <div className="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded">
                   {success}
@@ -138,7 +138,7 @@ export default function Settings() {
               <form onSubmit={handleProfileSubmit} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">First Name</label>
+                    <label className="block text-sm font-medium text-gray-700">Prénom</label>
                     <input
                       type="text"
                       name="firstName"
@@ -148,7 +148,7 @@ export default function Settings() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Last Name</label>
+                    <label className="block text-sm font-medium text-gray-700">Nom de Famille</label>
                     <input
                       type="text"
                       name="lastName"
@@ -174,7 +174,7 @@ export default function Settings() {
                     disabled={loading}
                     className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
                   >
-                    {loading ? "Saving..." : "Save Changes"}
+                    {loading ? "Enregistrement..." : "Enregistrer les Modifications"}
                   </button>
                 </div>
               </form>
@@ -184,7 +184,7 @@ export default function Settings() {
           {/* Security Settings */}
           {activeTab === "security" && (
             <div>
-              <h2 className="text-lg font-medium text-gray-900 mb-4">Change Password</h2>
+              <h2 className="text-lg font-medium text-gray-900 mb-4">Changer le Mot de Passe</h2>
               {success && (
                 <div className="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded">
                   {success}
@@ -195,7 +195,7 @@ export default function Settings() {
               )}
               <form onSubmit={handlePasswordSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Current Password</label>
+                  <label className="block text-sm font-medium text-gray-700">Mot de Passe Actuel</label>
                   <input
                     type="password"
                     name="currentPassword"
@@ -205,7 +205,7 @@ export default function Settings() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">New Password</label>
+                  <label className="block text-sm font-medium text-gray-700">Nouveau Mot de Passe</label>
                   <input
                     type="password"
                     name="newPassword"
@@ -215,7 +215,7 @@ export default function Settings() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Confirm New Password</label>
+                  <label className="block text-sm font-medium text-gray-700">Confirmer le Nouveau Mot de Passe</label>
                   <input
                     type="password"
                     name="confirmPassword"
@@ -230,18 +230,18 @@ export default function Settings() {
                     disabled={loading}
                     className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
                   >
-                    {loading ? "Changing..." : "Change Password"}
+                    {loading ? "Modification..." : "Changer le Mot de Passe"}
                   </button>
                 </div>
               </form>
 
               <div className="mt-8 border-t border-gray-200 pt-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Danger Zone</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Zone de Danger</h3>
                 <button
                   onClick={logout}
                   className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                 >
-                  Sign Out
+                  Se Déconnecter
                 </button>
               </div>
             </div>
@@ -250,7 +250,7 @@ export default function Settings() {
           {/* Notifications Settings */}
           {activeTab === "notifications" && (
             <div>
-              <h2 className="text-lg font-medium text-gray-900 mb-4">Notification Preferences</h2>
+              <h2 className="text-lg font-medium text-gray-900 mb-4">Préférences de Notification</h2>
               <div className="space-y-4">
                 <div className="flex items-start">
                   <div className="flex items-center h-5">
@@ -263,9 +263,11 @@ export default function Settings() {
                   </div>
                   <div className="ml-3 text-sm">
                     <label htmlFor="email-notifications" className="font-medium text-gray-700">
-                      Email Notifications
+                      Notifications par Email
                     </label>
-                    <p className="text-gray-500">Receive email notifications for important updates and events.</p>
+                    <p className="text-gray-500">
+                      Recevoir des notifications par email pour les mises à jour importantes et les événements.
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-start">
@@ -279,9 +281,11 @@ export default function Settings() {
                   </div>
                   <div className="ml-3 text-sm">
                     <label htmlFor="payment-notifications" className="font-medium text-gray-700">
-                      Payment Notifications
+                      Notifications de Paiement
                     </label>
-                    <p className="text-gray-500">Receive notifications when payments are made or due.</p>
+                    <p className="text-gray-500">
+                      Recevoir des notifications lorsque les paiements sont effectués ou dus.
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-start">
@@ -295,9 +299,11 @@ export default function Settings() {
                   </div>
                   <div className="ml-3 text-sm">
                     <label htmlFor="project-updates" className="font-medium text-gray-700">
-                      Project Updates
+                      Mises à Jour de Projet
                     </label>
-                    <p className="text-gray-500">Receive notifications about project status changes.</p>
+                    <p className="text-gray-500">
+                      Recevoir des notifications sur les changements de statut des projets.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -306,7 +312,7 @@ export default function Settings() {
                   type="button"
                   className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
-                  Save Preferences
+                  Enregistrer les Préférences
                 </button>
               </div>
             </div>
@@ -315,29 +321,29 @@ export default function Settings() {
           {/* Preferences Settings */}
           {activeTab === "preferences" && (
             <div>
-              <h2 className="text-lg font-medium text-gray-900 mb-4">Application Preferences</h2>
+              <h2 className="text-lg font-medium text-gray-900 mb-4">Préférences de l'Application</h2>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Language</label>
+                  <label className="block text-sm font-medium text-gray-700">Langue</label>
                   <select className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                    <option value="en">English</option>
+                    <option value="en">Anglais</option>
                     <option value="fr">Français</option>
                     <option value="ar">العربية</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Date Format</label>
+                  <label className="block text-sm font-medium text-gray-700">Format de Date</label>
                   <select className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                    <option value="MM/DD/YYYY">MM/DD/YYYY</option>
-                    <option value="DD/MM/YYYY">DD/MM/YYYY</option>
-                    <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                    <option value="MM/DD/YYYY">MM/JJ/AAAA</option>
+                    <option value="DD/MM/YYYY">JJ/MM/AAAA</option>
+                    <option value="YYYY-MM-DD">AAAA-MM-JJ</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Currency</label>
+                  <label className="block text-sm font-medium text-gray-700">Devise</label>
                   <select className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                    <option value="MAD">Moroccan Dirham (MAD)</option>
-                    <option value="USD">US Dollar (USD)</option>
+                    <option value="MAD">Dirham Marocain (MAD)</option>
+                    <option value="USD">Dollar Américain (USD)</option>
                     <option value="EUR">Euro (EUR)</option>
                   </select>
                 </div>
@@ -352,9 +358,9 @@ export default function Settings() {
                   </div>
                   <div className="ml-3 text-sm">
                     <label htmlFor="dark-mode" className="font-medium text-gray-700">
-                      Dark Mode
+                      Mode Sombre
                     </label>
-                    <p className="text-gray-500">Use dark theme for the application interface.</p>
+                    <p className="text-gray-500">Utiliser le thème sombre pour l'interface de l'application.</p>
                   </div>
                 </div>
               </div>
@@ -363,7 +369,7 @@ export default function Settings() {
                   type="button"
                   className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
-                  Save Preferences
+                  Enregistrer les Préférences
                 </button>
               </div>
             </div>

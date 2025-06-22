@@ -35,7 +35,7 @@ export default function Clients() {
       setClients(response.data.clients)
       setTotalPages(response.data.totalPages)
     } catch (error) {
-      console.error("Failed to fetch clients:", error)
+      console.error("Échec de la récupération des clients:", error)
     } finally {
       setLoading(false)
     }
@@ -61,7 +61,7 @@ export default function Clients() {
       setDeleteModal({ show: false, client: null })
       fetchClients()
     } catch (error) {
-      console.error("Failed to delete client:", error)
+      console.error("Échec de la suppression du client:", error)
     }
   }
 
@@ -88,14 +88,14 @@ export default function Clients() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Clients</h1>
-          <p className="mt-1 text-sm text-gray-500">Manage your client relationships and information</p>
+          <p className="mt-1 text-sm text-gray-500">Gérez vos relations et informations clients</p>
         </div>
         <button
           onClick={handleCreateClient}
           className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         >
           <PlusIcon className="h-4 w-4 mr-2" />
-          Add Client
+          Ajouter un client
         </button>
       </div>
 
@@ -103,10 +103,10 @@ export default function Clients() {
       <div className="bg-white p-4 rounded-lg shadow">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="relative">
-            <MagnifyingGlassIcon className="h-5 w-5 absolute left-3 top-3 text-gray-400" />
+            <MagnifyingGlassIcon className="h-5 w-5 absolute left-2 top-1 text-gray-400" />
             <input
               type="text"
-              placeholder="Search clients..."
+              placeholder="Rechercher des clients..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
@@ -117,10 +117,10 @@ export default function Clients() {
             onChange={(e) => setStatusFilter(e.target.value)}
             className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
           >
-            <option value="">All Statuses</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-            <option value="archived">Archived</option>
+            <option value="">Tous les statuts</option>
+            <option value="active">Actif</option>
+            <option value="inactive">Inactif</option>
+            <option value="archived">Archivé</option>
           </select>
         </div>
       </div>
@@ -143,10 +143,10 @@ export default function Clients() {
                     Contact
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Projects
+                    Projets
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
+                    Statut
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
@@ -169,7 +169,7 @@ export default function Clients() {
                       <div className="text-sm text-gray-500">{client.phone}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{client.projects?.length || 0} projects</div>
+                      <div className="text-sm text-gray-900">{client.projects?.length || 0} projets</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
@@ -177,25 +177,27 @@ export default function Clients() {
                           client.status,
                         )}`}
                       >
-                        {client.status}
+                        {client.status === 'active' && 'Actif'}
+                        {client.status === 'inactive' && 'Inactif'}
+                        {client.status === 'archived' && 'Archivé'}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex space-x-2">
-                        <Link to={`/clients/${client.id}`} className="text-blue-600 hover:text-blue-900" title="View">
+                        <Link to={`/clients/${client.id}`} className="text-blue-600 hover:text-blue-900" title="Voir">
                           <EyeIcon className="h-4 w-4" />
                         </Link>
                         <button
                           onClick={() => handleEditClient(client)}
                           className="text-indigo-600 hover:text-indigo-900"
-                          title="Edit"
+                          title="Modifier"
                         >
                           <PencilIcon className="h-4 w-4" />
                         </button>
                         <button
                           onClick={() => handleDeleteClient(client)}
                           className="text-red-600 hover:text-red-900"
-                          title="Delete"
+                          title="Supprimer"
                         >
                           <TrashIcon className="h-4 w-4" />
                         </button>
@@ -215,20 +217,20 @@ export default function Clients() {
                     disabled={currentPage === 1}
                     className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
                   >
-                    Previous
+                    Précédent
                   </button>
                   <button
                     onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                     disabled={currentPage === totalPages}
                     className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
                   >
-                    Next
+                    Suivant
                   </button>
                 </div>
                 <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                   <div>
                     <p className="text-sm text-gray-700">
-                      Page <span className="font-medium">{currentPage}</span> of{" "}
+                      Page <span className="font-medium">{currentPage}</span> sur{" "}
                       <span className="font-medium">{totalPages}</span>
                     </p>
                   </div>
@@ -261,8 +263,8 @@ export default function Clients() {
 
       {deleteModal.show && (
         <DeleteConfirmModal
-          title="Delete Client"
-          message={`Are you sure you want to delete ${deleteModal.client?.firstName} ${deleteModal.client?.lastName}? This action cannot be undone.`}
+          title="Supprimer le client"
+          message={`Êtes-vous sûr de vouloir supprimer ${deleteModal.client?.firstName} ${deleteModal.client?.lastName} ? Cette action est irréversible.`}
           onConfirm={confirmDelete}
           onCancel={() => setDeleteModal({ show: false, client: null })}
         />

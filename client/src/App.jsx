@@ -7,6 +7,7 @@ import Register from "./pages/Register"
 import Dashboard from "./pages/Dashboard"
 import Clients from "./pages/Clients"
 import Projects from "./pages/Projects"
+import ProjectDetail from "./pages/ProjectDetail"
 import Documents from "./pages/Documents"
 import Payments from "./pages/Payments"
 import Settings from "./pages/Settings"
@@ -28,6 +29,7 @@ function App() {
                     <Route path="/" element={<Dashboard />} />
                     <Route path="/clients" element={<Clients />} />
                     <Route path="/projects" element={<Projects />} />
+                    <Route path="/projects/:id" element={<ProjectDetail />} />
                     <Route path="/documents" element={<Documents />} />
                     <Route path="/payments" element={<Payments />} />
                     <Route path="/settings" element={<Settings />} />

@@ -194,6 +194,36 @@ const deletePayment = async (req, res) => {
   }
 }
 
+const getPaymentsByProject = async (req, res) => {
+  try {
+    const { projectId } = req.params
+
+    const payments = await Payment.findAll({
+      where: { projectId },
+      order: [["paymentDate", "DESC"]],
+      include: [
+        {
+          model: Project,
+          as: "project",
+          attributes: ["title"],
+          include: [
+            {
+              model: Client,
+              as: "client",
+              attributes: ["firstName", "lastName"],
+            },
+          ],
+        },
+      ],
+    })
+
+    res.json({ payments })
+  } catch (error) {
+    console.error("Get payments by project error:", error)
+    res.status(500).json({ message: "Erreur interne du serveur" })
+  }
+}
+
 const getPaymentStats = async (req, res) => {
   try {
     const { startDate, endDate, projectId } = req.query
@@ -249,6 +279,7 @@ const getPaymentStats = async (req, res) => {
 module.exports = {
   getAllPayments,
   getPaymentById,
+  getPaymentsByProject,
   createPayment,
   updatePayment,
   deletePayment,

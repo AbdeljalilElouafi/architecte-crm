@@ -1,5 +1,4 @@
 "use client"
-
 import { useEffect } from "react"
 import { XMarkIcon } from "@heroicons/react/24/outline"
 
@@ -30,15 +29,17 @@ export default function Modal({ title, children, onClose, size = "md" }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-gray-500 bg-opacity-75 flex items-center justify-center p-4">
-      <div className={`bg-white rounded-lg shadow-xl w-full ${sizeClasses[size]} transform transition-all`}>
-        <div className="flex items-center justify-between p-4 border-b">
-          <h3 className="text-lg font-medium text-gray-900">{title}</h3>
-          <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-500 focus:outline-none">
-            <XMarkIcon className="h-6 w-6" />
-          </button>
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-gray-500 bg-opacity-75">
+      <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+        <div className={`bg-white rounded-lg shadow-xl w-full ${sizeClasses[size]} transform transition-all my-8 sm:my-8`}>
+          <div className="flex items-center justify-between p-4 border-b">
+            <h3 className="text-lg font-medium text-gray-900">{title}</h3>
+            <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-500 focus:outline-none">
+              <XMarkIcon className="h-6 w-6" />
+            </button>
+          </div>
+          <div className="p-4 max-h-[calc(100vh-8rem)] overflow-y-auto">{children}</div>
         </div>
-        <div className="p-4">{children}</div>
       </div>
     </div>
   )
