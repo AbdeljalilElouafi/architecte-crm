@@ -15,24 +15,34 @@ import {
   CheckCircleIcon,
   ClockIcon,
   EyeIcon,
+  CloudArrowUpIcon,
 } from "@heroicons/react/24/outline"
-import { projectsAPI, paymentsAPI } from "../services/api.jsx"
+import { projectsAPI, paymentsAPI, documentsAPI, clientsAPI } from "../services/api.jsx"
 import PaymentModal from "../components/Payments/PaymentModal"
+import DocumentUploadModal from "../components/Documents/DocumentUploadModal"
 import DeleteConfirmModal from "../components/Common/DeleteConfirmModal"
+import ProjectModal from "../components/Projects/ProjectModal"
 
 export default function ProjectDetail() {
   const { id } = useParams()
   const [project, setProject] = useState(null)
   const [payments, setPayments] = useState([])
+  const [documents, setDocuments] = useState([])
   const [loading, setLoading] = useState(true)
   const [showPaymentModal, setShowPaymentModal] = useState(false)
+  const [showDocumentModal, setShowDocumentModal] = useState(false)
+  const [editingPayment, setEditingPayment] = useState(null)
   const [deleteModal, setDeleteModal] = useState({ show: false, payment: null })
   const [error, setError] = useState("")
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [clients, setClients] = useState([])
 
   useEffect(() => {
     if (id) {
       fetchProject()
       fetchPayments()
+      fetchDocuments()
+      fetchClients()
     }
   }, [id])
 
@@ -48,13 +58,6 @@ export default function ProjectDetail() {
 
   const fetchPayments = async () => {
     try {
-      // Check if the API function exists
-      if (typeof paymentsAPI.getByProject !== "function") {
-        console.error("paymentsAPI.getByProject is not defined. Please check your API service.")
-        setPayments([])
-        return
-      }
-
       const response = await paymentsAPI.getByProject(id)
       setPayments(response.data.payments || [])
     } catch (error) {
@@ -65,10 +68,31 @@ export default function ProjectDetail() {
     }
   }
 
+  const fetchDocuments = async () => {
+    try {
+      const response = await documentsAPI.getAll({ projectId: id })
+      setDocuments(response.data.documents || [])
+    } catch (error) {
+      console.error("Erreur lors de la récupération des documents:", error)
+      setDocuments([])
+    }
+  }
+
   const handlePaymentAdded = () => {
     setShowPaymentModal(false)
+    setEditingPayment(null)
     fetchProject() // Refresh project to update financial summary
     fetchPayments() // Refresh payments list
+  }
+
+  const handleDocumentAdded = () => {
+    setShowDocumentModal(false)
+    fetchDocuments() // Refresh documents list
+  }
+
+  const handleEditPayment = (payment) => {
+    setEditingPayment(payment)
+    setShowPaymentModal(true)
   }
 
   const handleDeletePayment = (payment) => {
@@ -83,6 +107,43 @@ export default function ProjectDetail() {
       fetchPayments()
     } catch (error) {
       console.error("Erreur lors de la suppression du paiement:", error)
+    }
+  }
+
+  const handleDownloadDocument = async (documentId, filename) => {
+    try {
+      const response = await documentsAPI.download(documentId)
+      const url = window.URL.createObjectURL(new Blob([response.data]))
+      const link = document.createElement("a")
+      link.href = url
+      link.setAttribute("download", filename)
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      window.URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error("Erreur lors du téléchargement:", error)
+    }
+  }
+
+  const handleEditProject = (project, e) => {
+    e?.stopPropagation() // Prevent any event bubbling
+    setShowEditModal(true)
+  }
+
+  const handleEditModalClose = (shouldRefresh) => {
+    setShowEditModal(false)
+    if (shouldRefresh) {
+      fetchProject() // Refresh project data after edit
+    }
+  }
+
+  const fetchClients = async () => {
+    try {
+      const response = await clientsAPI.getAll({ limit: 100 })
+      setClients(response.data.clients || [])
+    } catch (error) {
+      console.error("Error fetching clients:", error)
     }
   }
 
@@ -157,22 +218,10 @@ export default function ProjectDetail() {
 
   // Calculate financial data from actual payments and project data
   const totalPaid = payments.reduce((sum, payment) => sum + (Number.parseFloat(payment.amount) || 0), 0)
-
   // Try to get total price from multiple sources
   const totalPrice = project.financialSummary?.totalPrice || project.totalPrice || project.budget || project.price || 0
-
   const remainingAmount = Math.max(0, totalPrice - totalPaid)
   const paymentProgress = totalPrice > 0 ? Math.min(100, (totalPaid / totalPrice) * 100) : 0
-
-  // Debug logging (remove in production)
-  console.log("Financial Debug:", {
-    totalPaid,
-    totalPrice,
-    financialSummary: project.financialSummary,
-    project: project,
-    paymentProgress,
-    paymentsCount: payments.length,
-  })
 
   return (
     <div className="space-y-6">
@@ -187,13 +236,20 @@ export default function ProjectDetail() {
               </Link>
             </div>
             <div className="flex items-center space-x-3">
-              <Link
-                to={`/projects/${project.id}/edit`}
+              <button
+                onClick={(e) => handleEditProject(project, e)}
                 className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
               >
                 <PencilIcon className="h-4 w-4 mr-2" />
                 Modifier
-              </Link>
+              </button>
+              <button
+                onClick={() => setShowDocumentModal(true)}
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700"
+              >
+                <CloudArrowUpIcon className="h-4 w-4 mr-2" />
+                Téléverser un document
+              </button>
               <button
                 onClick={() => setShowPaymentModal(true)}
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
@@ -213,7 +269,6 @@ export default function ProjectDetail() {
             <div className="flex-1">
               <h1 className="text-2xl font-bold text-gray-900">{project.title}</h1>
               <p className="mt-2 text-gray-600">{project.description}</p>
-
               <div className="mt-4 flex flex-wrap items-center gap-4">
                 <span
                   className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(project.status)}`}
@@ -281,7 +336,6 @@ export default function ProjectDetail() {
       <div className="bg-white shadow rounded-lg">
         <div className="px-6 py-6">
           <h2 className="text-lg font-medium text-gray-900 mb-6">Aperçu financier</h2>
-
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             <div className="bg-blue-50 rounded-lg p-4">
               <div className="flex items-center">
@@ -414,6 +468,13 @@ export default function ProjectDetail() {
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div className="flex items-center space-x-2">
                           <button
+                            onClick={() => handleEditPayment(payment)}
+                            className="text-indigo-600 hover:text-indigo-900"
+                            title="Modifier"
+                          >
+                            <PencilIcon className="h-4 w-4" />
+                          </button>
+                          <button
                             onClick={() => handleDeletePayment(payment)}
                             className="text-red-600 hover:text-red-900"
                             title="Supprimer"
@@ -431,37 +492,68 @@ export default function ProjectDetail() {
         </div>
       </div>
 
-      {/* Project Documents/Files Section */}
-      {project.documents && project.documents.length > 0 && (
-        <div className="bg-white shadow rounded-lg">
-          <div className="px-6 py-6">
-            <h2 className="text-lg font-medium text-gray-900 mb-6">Documents du Projet</h2>
+      {/* Documents Section */}
+      <div className="bg-white shadow rounded-lg">
+        <div className="px-6 py-6">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-medium text-gray-900">Documents du Projet</h2>
+            <button
+              onClick={() => setShowDocumentModal(true)}
+              className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-green-700 bg-green-100 hover:bg-green-200"
+            >
+              <CloudArrowUpIcon className="h-4 w-4 mr-2" />
+              Téléverser un document
+            </button>
+          </div>
+
+          {documents.length === 0 ? (
+            <div className="text-center py-12">
+              <DocumentTextIcon className="mx-auto h-12 w-12 text-gray-400" />
+              <h3 className="mt-2 text-sm font-medium text-gray-900">Aucun document</h3>
+              <p className="mt-1 text-sm text-gray-500">Commencez par téléverser un document pour ce projet.</p>
+              <div className="mt-6">
+                <button
+                  onClick={() => setShowDocumentModal(true)}
+                  className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
+                >
+                  <CloudArrowUpIcon className="h-4 w-4 mr-2" />
+                  Téléverser le Premier document
+                </button>
+              </div>
+            </div>
+          ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {project.documents.map((doc, index) => (
-                <div key={index} className="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
-                  <DocumentTextIcon className="h-8 w-8 text-gray-400 mr-3" />
+              {documents.map((doc) => (
+                <div
+                  key={doc.id}
+                  className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <DocumentTextIcon className="h-8 w-8 text-gray-400 mr-3 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">{doc.name}</p>
-                    <p className="text-xs text-gray-500">{doc.size}</p>
+                    <p className="text-sm font-medium text-gray-900 truncate">{doc.title}</p>
+                    <p className="text-xs text-gray-500">{doc.category}</p>
+                    {doc.description && <p className="text-xs text-gray-400 truncate mt-1">{doc.description}</p>}
                   </div>
-                  <button className="ml-2 text-blue-600 hover:text-blue-800">
+                  <button
+                    onClick={() => handleDownloadDocument(doc.id, doc.filename)}
+                    className="ml-2 text-blue-600 hover:text-blue-800 flex-shrink-0"
+                    title="Télécharger"
+                  >
                     <EyeIcon className="h-4 w-4" />
                   </button>
                 </div>
               ))}
             </div>
-          </div>
+          )}
         </div>
-      )}
+      </div>
 
       {/* Modals */}
       {showPaymentModal && (
-        <PaymentModal
-          projectId={project.id}
-          onClose={() => setShowPaymentModal(false)}
-          onPaymentAdded={handlePaymentAdded}
-        />
+        <PaymentModal payment={editingPayment} projectId={project.id} onClose={handlePaymentAdded} />
       )}
+
+      {showDocumentModal && <DocumentUploadModal projectId={project.id} onClose={handleDocumentAdded} />}
 
       {deleteModal.show && (
         <DeleteConfirmModal
@@ -471,6 +563,8 @@ export default function ProjectDetail() {
           onCancel={() => setDeleteModal({ show: false, payment: null })}
         />
       )}
+
+      {showEditModal && <ProjectModal project={project} clients={clients} onClose={handleEditModalClose} />}
     </div>
   )
 }

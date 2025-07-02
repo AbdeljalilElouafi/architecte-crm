@@ -7,6 +7,7 @@ const getAllPayments = async (req, res) => {
     const offset = (page - 1) * limit
 
     const whereClause = {}
+
     if (projectId) whereClause.projectId = projectId
     if (status) whereClause.status = status
     if (method) whereClause.method = method
@@ -61,6 +62,7 @@ const getAllPayments = async (req, res) => {
 const getPaymentById = async (req, res) => {
   try {
     const { id } = req.params
+
     const payment = await Payment.findByPk(id, {
       include: [
         {
@@ -89,7 +91,10 @@ const getPaymentById = async (req, res) => {
 
 const createPayment = async (req, res) => {
   try {
-    const { projectId, amount, method, reference, notes, paymentDate } = req.body
+    const { projectId, amount, method, paymentMethod, reference, notes, paymentDate } = req.body
+
+    // Handle both 'method' and 'paymentMethod' field names for compatibility
+    const finalMethod = method || paymentMethod
 
     // Verify project exists
     const project = await Project.findByPk(projectId)
@@ -100,7 +105,7 @@ const createPayment = async (req, res) => {
     const payment = await Payment.create({
       projectId,
       amount: Number.parseFloat(amount),
-      method,
+      method: finalMethod,
       reference,
       notes,
       paymentDate: paymentDate ? new Date(paymentDate) : new Date(),
@@ -134,11 +139,13 @@ const createPayment = async (req, res) => {
 const updatePayment = async (req, res) => {
   try {
     const { id } = req.params
-    const { amount, method, reference, notes, status, paymentDate } = req.body
+    const { amount, method, paymentMethod, reference, notes, status, paymentDate } = req.body
 
     const updateData = {}
+
     if (amount !== undefined) updateData.amount = Number.parseFloat(amount)
-    if (method) updateData.method = method
+    // Handle both 'method' and 'paymentMethod' field names for compatibility
+    if (method || paymentMethod) updateData.method = method || paymentMethod
     if (reference !== undefined) updateData.reference = reference
     if (notes !== undefined) updateData.notes = notes
     if (status) updateData.status = status
@@ -179,6 +186,7 @@ const updatePayment = async (req, res) => {
 const deletePayment = async (req, res) => {
   try {
     const { id } = req.params
+
     const deletedRowsCount = await Payment.destroy({
       where: { id },
     })
