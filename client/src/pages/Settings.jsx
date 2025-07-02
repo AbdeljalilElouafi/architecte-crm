@@ -89,8 +89,6 @@ export default function Settings() {
   const tabs = [
     { id: "profile", name: "Profil", icon: UserIcon },
     { id: "security", name: "Sécurité", icon: KeyIcon },
-    { id: "notifications", name: "Notifications", icon: BellIcon },
-    { id: "preferences", name: "Préférences", icon: GlobeAltIcon },
   ]
 
   return (
@@ -126,7 +124,7 @@ export default function Settings() {
           {/* Profile Settings */}
           {activeTab === "profile" && (
             <div>
-              <h2 className="text-lg font-medium text-gray-900 mb-4">Informations du Profil</h2>
+              <h2 className="text-lg font-medium text-gray-900 mb-4">Informations du profil</h2>
               {success && (
                 <div className="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded">
                   {success}
@@ -148,7 +146,7 @@ export default function Settings() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Nom de Famille</label>
+                    <label className="block text-sm font-medium text-gray-700">Nom de famille</label>
                     <input
                       type="text"
                       name="lastName"
@@ -174,7 +172,7 @@ export default function Settings() {
                     disabled={loading}
                     className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
                   >
-                    {loading ? "Enregistrement..." : "Enregistrer les Modifications"}
+                    {loading ? "Enregistrement..." : "Enregistrer les modifications"}
                   </button>
                 </div>
               </form>
@@ -184,7 +182,7 @@ export default function Settings() {
           {/* Security Settings */}
           {activeTab === "security" && (
             <div>
-              <h2 className="text-lg font-medium text-gray-900 mb-4">Changer le Mot de Passe</h2>
+              <h2 className="text-lg font-medium text-gray-900 mb-4">Changer le mot de passe</h2>
               {success && (
                 <div className="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded">
                   {success}
@@ -195,7 +193,7 @@ export default function Settings() {
               )}
               <form onSubmit={handlePasswordSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Mot de Passe Actuel</label>
+                  <label className="block text-sm font-medium text-gray-700">Mot de passe actuel</label>
                   <input
                     type="password"
                     name="currentPassword"
@@ -205,7 +203,7 @@ export default function Settings() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Nouveau Mot de Passe</label>
+                  <label className="block text-sm font-medium text-gray-700">Nouveau mot de passe</label>
                   <input
                     type="password"
                     name="newPassword"
@@ -215,7 +213,7 @@ export default function Settings() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Confirmer le Nouveau Mot de Passe</label>
+                  <label className="block text-sm font-medium text-gray-700">Confirmer le nouveau mot de passe</label>
                   <input
                     type="password"
                     name="confirmPassword"
@@ -230,13 +228,12 @@ export default function Settings() {
                     disabled={loading}
                     className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
                   >
-                    {loading ? "Modification..." : "Changer le Mot de Passe"}
+                    {loading ? "Modification..." : "Changer le mot de passe"}
                   </button>
                 </div>
               </form>
 
               <div className="mt-8 border-t border-gray-200 pt-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Zone de Danger</h3>
                 <button
                   onClick={logout}
                   className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
@@ -247,133 +244,6 @@ export default function Settings() {
             </div>
           )}
 
-          {/* Notifications Settings */}
-          {activeTab === "notifications" && (
-            <div>
-              <h2 className="text-lg font-medium text-gray-900 mb-4">Préférences de Notification</h2>
-              <div className="space-y-4">
-                <div className="flex items-start">
-                  <div className="flex items-center h-5">
-                    <input
-                      id="email-notifications"
-                      name="email-notifications"
-                      type="checkbox"
-                      className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded"
-                    />
-                  </div>
-                  <div className="ml-3 text-sm">
-                    <label htmlFor="email-notifications" className="font-medium text-gray-700">
-                      Notifications par Email
-                    </label>
-                    <p className="text-gray-500">
-                      Recevoir des notifications par email pour les mises à jour importantes et les événements.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start">
-                  <div className="flex items-center h-5">
-                    <input
-                      id="payment-notifications"
-                      name="payment-notifications"
-                      type="checkbox"
-                      className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded"
-                    />
-                  </div>
-                  <div className="ml-3 text-sm">
-                    <label htmlFor="payment-notifications" className="font-medium text-gray-700">
-                      Notifications de Paiement
-                    </label>
-                    <p className="text-gray-500">
-                      Recevoir des notifications lorsque les paiements sont effectués ou dus.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start">
-                  <div className="flex items-center h-5">
-                    <input
-                      id="project-updates"
-                      name="project-updates"
-                      type="checkbox"
-                      className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded"
-                    />
-                  </div>
-                  <div className="ml-3 text-sm">
-                    <label htmlFor="project-updates" className="font-medium text-gray-700">
-                      Mises à Jour de Projet
-                    </label>
-                    <p className="text-gray-500">
-                      Recevoir des notifications sur les changements de statut des projets.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="mt-6">
-                <button
-                  type="button"
-                  className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                >
-                  Enregistrer les Préférences
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Preferences Settings */}
-          {activeTab === "preferences" && (
-            <div>
-              <h2 className="text-lg font-medium text-gray-900 mb-4">Préférences de l'Application</h2>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Langue</label>
-                  <select className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                    <option value="en">Anglais</option>
-                    <option value="fr">Français</option>
-                    <option value="ar">العربية</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Format de Date</label>
-                  <select className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                    <option value="MM/DD/YYYY">MM/JJ/AAAA</option>
-                    <option value="DD/MM/YYYY">JJ/MM/AAAA</option>
-                    <option value="YYYY-MM-DD">AAAA-MM-JJ</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Devise</label>
-                  <select className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                    <option value="MAD">Dirham Marocain (MAD)</option>
-                    <option value="USD">Dollar Américain (USD)</option>
-                    <option value="EUR">Euro (EUR)</option>
-                  </select>
-                </div>
-                <div className="flex items-start">
-                  <div className="flex items-center h-5">
-                    <input
-                      id="dark-mode"
-                      name="dark-mode"
-                      type="checkbox"
-                      className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded"
-                    />
-                  </div>
-                  <div className="ml-3 text-sm">
-                    <label htmlFor="dark-mode" className="font-medium text-gray-700">
-                      Mode Sombre
-                    </label>
-                    <p className="text-gray-500">Utiliser le thème sombre pour l'interface de l'application.</p>
-                  </div>
-                </div>
-              </div>
-              <div className="mt-6">
-                <button
-                  type="button"
-                  className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                >
-                  Enregistrer les Préférences
-                </button>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>

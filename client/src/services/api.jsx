@@ -89,6 +89,7 @@ export const paymentsAPI = {
 // Dashboard API
 export const dashboardAPI = {
   getStats: () => api.get("/dashboard/stats"),
+  getMonthlyRevenue: (year) => api.get(`/dashboard/monthly-revenue${year ? `?year=${year}` : ""}`),
 }
 
 export default api

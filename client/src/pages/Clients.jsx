@@ -2,7 +2,15 @@
 
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
-import { PlusIcon, MagnifyingGlassIcon, PencilIcon, TrashIcon, EyeIcon } from "@heroicons/react/24/outline"
+import {
+  PlusIcon,
+  MagnifyingGlassIcon,
+  PencilIcon,
+  TrashIcon,
+  EyeIcon,
+  UserIcon,
+  BuildingOfficeIcon,
+} from "@heroicons/react/24/outline"
 import { clientsAPI } from "../services/api.jsx"
 import ClientModal from "../components/Clients/ClientModal"
 import DeleteConfirmModal from "../components/Common/DeleteConfirmModal"
@@ -12,6 +20,7 @@ export default function Clients() {
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("")
+  const [clientTypeFilter, setClientTypeFilter] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [showModal, setShowModal] = useState(false)
@@ -20,7 +29,7 @@ export default function Clients() {
 
   useEffect(() => {
     fetchClients()
-  }, [currentPage, searchTerm, statusFilter])
+  }, [currentPage, searchTerm, statusFilter, clientTypeFilter])
 
   const fetchClients = async () => {
     try {
@@ -30,6 +39,7 @@ export default function Clients() {
         limit: 10,
         search: searchTerm,
         status: statusFilter,
+        clientType: clientTypeFilter,
       }
       const response = await clientsAPI.getAll(params)
       setClients(response.data.clients)
@@ -82,6 +92,26 @@ export default function Clients() {
     return colors[status] || colors.active
   }
 
+  const getClientTypeBadge = (clientType) => {
+    return clientType === "individual" ? "bg-blue-100 text-blue-800" : "bg-purple-100 text-purple-800"
+  }
+
+  const getClientDisplayName = (client) => {
+    if (client.clientType === "individual") {
+      return `${client.firstName} ${client.lastName}`
+    } else {
+      return client.companyName
+    }
+  }
+
+  const getClientIdentifier = (client) => {
+    if (client.clientType === "individual") {
+      return `CIN: ${client.cin}`
+    } else {
+      return `RC: ${client.rc} | ICE: ${client.ice}`
+    }
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -101,9 +131,9 @@ export default function Clients() {
 
       {/* Filters */}
       <div className="bg-white p-4 rounded-lg shadow">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="relative">
-            <MagnifyingGlassIcon className="h-5 w-5 absolute left-2 top-1 text-gray-400" />
+            <MagnifyingGlassIcon className="h-5 w-5 absolute left-3 top-3 text-gray-400" />
             <input
               type="text"
               placeholder="Rechercher des clients..."
@@ -112,6 +142,17 @@ export default function Clients() {
               className="pl-10 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             />
           </div>
+
+          <select
+            value={clientTypeFilter}
+            onChange={(e) => setClientTypeFilter(e.target.value)}
+            className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          >
+            <option value="">Tous les types</option>
+            <option value="individual">Personne physique</option>
+            <option value="corporate">Personne morale</option>
+          </select>
+
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
@@ -140,6 +181,9 @@ export default function Clients() {
                     Client
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Type
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Contact
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -157,12 +201,32 @@ export default function Clients() {
                 {clients.map((client) => (
                   <tr key={client.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div>
-                        <div className="text-sm font-medium text-gray-900">
-                          {client.firstName} {client.lastName}
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 h-10 w-10">
+                          <div
+                            className={`h-10 w-10 rounded-full flex items-center justify-center ${
+                              client.clientType === "individual" ? "bg-blue-100" : "bg-purple-100"
+                            }`}
+                          >
+                            {client.clientType === "individual" ? (
+                              <UserIcon className="h-5 w-5 text-blue-600" />
+                            ) : (
+                              <BuildingOfficeIcon className="h-5 w-5 text-purple-600" />
+                            )}
+                          </div>
                         </div>
-                        <div className="text-sm text-gray-500">CIN: {client.cin}</div>
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-gray-900">{getClientDisplayName(client)}</div>
+                          <div className="text-sm text-gray-500">{getClientIdentifier(client)}</div>
+                        </div>
                       </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getClientTypeBadge(client.clientType)}`}
+                      >
+                        {client.clientType === "individual" ? "Personne physique" : "Personne morale"}
+                      </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">{client.email}</div>
@@ -173,13 +237,11 @@ export default function Clients() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(
-                          client.status,
-                        )}`}
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(client.status)}`}
                       >
-                        {client.status === 'active' && 'Actif'}
-                        {client.status === 'inactive' && 'Inactif'}
-                        {client.status === 'archived' && 'Archivé'}
+                        {client.status === "active" && "Actif"}
+                        {client.status === "inactive" && "Inactif"}
+                        {client.status === "archived" && "Archivé"}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -260,11 +322,10 @@ export default function Clients() {
 
       {/* Modals */}
       {showModal && <ClientModal client={editingClient} onClose={handleModalClose} />}
-
       {deleteModal.show && (
         <DeleteConfirmModal
           title="Supprimer le client"
-          message={`Êtes-vous sûr de vouloir supprimer ${deleteModal.client?.firstName} ${deleteModal.client?.lastName} ? Cette action est irréversible.`}
+          message={`Êtes-vous sûr de vouloir supprimer ${getClientDisplayName(deleteModal.client)} ? Cette action est irréversible.`}
           onConfirm={confirmDelete}
           onCancel={() => setDeleteModal({ show: false, client: null })}
         />

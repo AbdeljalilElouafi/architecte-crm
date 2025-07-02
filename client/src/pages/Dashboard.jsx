@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
-import { UsersIcon, FolderIcon, CurrencyDollarIcon, ExclamationTriangleIcon } from "@heroicons/react/24/outline"
+import { UsersIcon, FolderIcon, CurrencyDollarIcon } from "@heroicons/react/24/outline"
 import { dashboardAPI } from "../services/api.jsx"
+import RevenueChart from "../components/RevenueChart.jsx"
 
 export default function Dashboard() {
   const [stats, setStats] = useState(null)
@@ -92,7 +93,8 @@ export default function Dashboard() {
         ))}
       </div>
 
-
+      {/* Revenue Chart - NEW SECTION */}
+      <RevenueChart stats={stats} />
 
       {/* Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -123,9 +125,9 @@ export default function Dashboard() {
                           : "bg-gray-100 text-gray-800"
                     }`}
                   >
-                    {project.status === 'completed' && 'Terminé'}
-                    {project.status === 'in_progress' && 'En cours'}
-                    {project.status === 'planning' && 'Planification'}
+                    {project.status === "completed" && "Terminé"}
+                    {project.status === "in_progress" && "En cours"}
+                    {project.status === "planning" && "Planification"}
                   </span>
                 </div>
               ))}
@@ -153,9 +155,7 @@ export default function Dashboard() {
                   </div>
                   <div className="text-right">
                     <p className="text-sm font-medium text-green-600">+{payment.amount.toLocaleString()} MAD</p>
-                    <p className="text-xs text-gray-500">
-                      {new Date(payment.paymentDate).toLocaleDateString('fr-FR')}
-                    </p>
+                    <p className="text-xs text-gray-500">{new Date(payment.paymentDate).toLocaleDateString("fr-FR")}</p>
                   </div>
                 </div>
               ))}
@@ -168,7 +168,6 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
-
     </div>
   )
 }

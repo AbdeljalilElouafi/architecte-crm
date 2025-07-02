@@ -199,7 +199,7 @@ export default function ProjectDetail() {
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
               >
                 <PlusIcon className="h-4 w-4 mr-2" />
-                Ajouter un Paiement
+                Ajouter un paiement
               </button>
             </div>
           </div>
@@ -280,7 +280,7 @@ export default function ProjectDetail() {
       {/* Financial Overview */}
       <div className="bg-white shadow rounded-lg">
         <div className="px-6 py-6">
-          <h2 className="text-lg font-medium text-gray-900 mb-6">Aperçu Financier</h2>
+          <h2 className="text-lg font-medium text-gray-900 mb-6">Aperçu financier</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             <div className="bg-blue-50 rounded-lg p-4">
@@ -347,13 +347,13 @@ export default function ProjectDetail() {
       <div className="bg-white shadow rounded-lg">
         <div className="px-6 py-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-medium text-gray-900">Historique des Paiements</h2>
+            <h2 className="text-lg font-medium text-gray-900">Historique des paiements</h2>
             <button
               onClick={() => setShowPaymentModal(true)}
               className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200"
             >
               <PlusIcon className="h-4 w-4 mr-2" />
-              Nouveau Paiement
+              Nouveau paiement
             </button>
           </div>
 
@@ -368,7 +368,7 @@ export default function ProjectDetail() {
                   className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
                 >
                   <PlusIcon className="h-4 w-4 mr-2" />
-                  Ajouter le Premier Paiement
+                  Ajouter le Premier paiement
                 </button>
               </div>
             </div>
@@ -465,7 +465,7 @@ export default function ProjectDetail() {
 
       {deleteModal.show && (
         <DeleteConfirmModal
-          title="Supprimer le Paiement"
+          title="Supprimer le paiement"
           message={`Êtes-vous sûr de vouloir supprimer ce paiement de ${deleteModal.payment?.amount?.toLocaleString()} MAD ? Cette action ne peut pas être annulée.`}
           onConfirm={confirmDeletePayment}
           onCancel={() => setDeleteModal({ show: false, payment: null })}
