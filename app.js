@@ -1,10 +1,11 @@
 // Load environment variables FIRST
-require("dotenv").config()
+import dotenv from "dotenv";
+dotenv.config();
 
-const express = require("express")
-const cors = require("cors")
-const helmet = require("helmet")
-const rateLimit = require("express-rate-limit")
+import express, { json, urlencoded } from "express"
+import cors from "cors"
+import helmet from "helmet"
+import rateLimit from "express-rate-limit"
 
 // Verify critical environment variables
 if (!process.env.JWT_SECRET) {
@@ -23,13 +24,13 @@ console.log("- DB_NAME:", process.env.DB_NAME || " Missing")
 console.log("- DB_HOST:", process.env.DB_HOST || "localhost")
 console.log("- CLIENT_URL:", process.env.CLIENT_URL || "http://localhost:5173")
 
-const { sequelize } = require("./server/models")
-const authRoutes = require("./server/routes/auth")
-const clientRoutes = require("./server/routes/clients")
-const projectRoutes = require("./server/routes/projects")
-const documentRoutes = require("./server/routes/documents")
-const paymentRoutes = require("./server/routes/payments")
-const dashboardRoutes = require("./server/routes/dashboard")
+import { sequelize } from "./server/models/index.js";
+import authRoutes from "./server/routes/auth.js";
+import clientRoutes from "./server/routes/clients.js";
+import projectRoutes from "./server/routes/projects.js";
+import documentRoutes from "./server/routes/documents.js";
+import paymentRoutes from "./server/routes/payments.js";
+import dashboardRoutes from "./server/routes/dashboard.js";
 
 const app = express()
 
@@ -50,8 +51,8 @@ const limiter = rateLimit({
 app.use(limiter)
 
 // Body parsing middleware
-app.use(express.json({ limit: "10mb" }))
-app.use(express.urlencoded({ extended: true }))
+app.use(json({ limit: "10mb" }))
+app.use(urlencoded({ extended: true }))
 
 // Routes
 app.use("/api/auth", authRoutes)
@@ -109,4 +110,4 @@ const startServer = async () => {
 
 startServer()
 
-module.exports = app
+export default app
