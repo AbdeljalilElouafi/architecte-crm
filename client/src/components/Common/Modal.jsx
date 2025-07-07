@@ -1,4 +1,5 @@
 "use client"
+
 import { useEffect } from "react"
 import { XMarkIcon } from "@heroicons/react/24/outline"
 
@@ -22,16 +23,18 @@ export default function Modal({ title, children, onClose, size = "md" }) {
 
   const sizeClasses = {
     sm: "max-w-md",
-    md: "max-w-lg",
-    lg: "max-w-2xl",
-    xl: "max-w-4xl",
+    md: "max-w-2xl",
+    lg: "max-w-4xl",
+    xl: "max-w-6xl",
     full: "max-w-full mx-4",
   }
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-gray-500 bg-opacity-75">
       <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-        <div className={`bg-white rounded-lg shadow-xl w-full ${sizeClasses[size]} transform transition-all my-8 sm:my-8`}>
+        <div
+          className={`bg-white rounded-lg shadow-xl w-full ${sizeClasses[size]} transform transition-all my-8 sm:my-8`}
+        >
           <div className="flex items-center justify-between p-4 border-b">
             <h3 className="text-lg font-medium text-gray-900">{title}</h3>
             <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-500 focus:outline-none">
