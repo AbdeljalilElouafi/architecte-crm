@@ -7,7 +7,7 @@ const Client = sequelize.define("Client", {
     primaryKey: true,
     autoIncrement: true,
   },
-  // Client type - individual or corporate
+  // Client type : individual or corporate
   clientType: {
     type: DataTypes.ENUM("individual", "corporate"),
     allowNull: false,

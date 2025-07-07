@@ -55,13 +55,6 @@ export default function Dashboard() {
       color: "bg-yellow-500",
       href: "/payments",
     },
-    {
-      name: "Revenu mensuel",
-      value: `${(stats?.overview?.monthlyRevenue || 0).toLocaleString()} MAD`,
-      icon: CurrencyDollarIcon,
-      color: "bg-purple-500",
-      href: "/payments",
-    },
   ]
 
   return (

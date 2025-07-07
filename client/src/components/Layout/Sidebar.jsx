@@ -21,7 +21,7 @@ const navigation = [
   { name: "Projets", href: "/projects", icon: FolderIcon },
   { name: "Documents", href: "/documents", icon: DocumentIcon },
   { name: "Paiements", href: "/payments", icon: CreditCardIcon },
-  { name: "Paramétres", href: "/settings", icon: Cog6ToothIcon },
+  { name: "Paramètres", href: "/settings", icon: Cog6ToothIcon },
 ]
 
 export default function Sidebar() {

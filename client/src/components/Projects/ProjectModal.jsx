@@ -143,7 +143,7 @@ return (
                     }
                   }}
                   isClearable
-                  placeholder="Rechercher des clients..."
+                  placeholder="Clients..."
                   classNamePrefix="select"
                   styles={{
                     control: (provided, state) => ({

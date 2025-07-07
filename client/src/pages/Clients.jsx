@@ -246,9 +246,6 @@ export default function Clients() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex space-x-2">
-                        <Link to={`/clients/${client.id}`} className="text-blue-600 hover:text-blue-900" title="Voir">
-                          <EyeIcon className="h-4 w-4" />
-                        </Link>
                         <button
                           onClick={() => handleEditClient(client)}
                           className="text-indigo-600 hover:text-indigo-900"
