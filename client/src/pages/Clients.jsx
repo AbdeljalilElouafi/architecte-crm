@@ -133,7 +133,7 @@ export default function Clients() {
       <div className="bg-white p-4 rounded-lg shadow">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="relative">
-            <MagnifyingGlassIcon className="h-5 w-5 absolute left-3 top-3 text-gray-400" />
+            <MagnifyingGlassIcon className="h-5 w-5 absolute left-2 top-1 text-gray-400" />
             <input
               type="text"
               placeholder="Rechercher des clients..."

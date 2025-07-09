@@ -3,7 +3,7 @@
 import { useEffect } from "react"
 import { XMarkIcon } from "@heroicons/react/24/outline"
 
-export default function Modal({ title, children, onClose, size = "md" }) {
+function Modal({ title, children, onClose, size = "md" }) {
   // Prevent scrolling when modal is open
   useEffect(() => {
     document.body.style.overflow = "hidden"
@@ -47,3 +47,5 @@ export default function Modal({ title, children, onClose, size = "md" }) {
     </div>
   )
 }
+
+export default Modal

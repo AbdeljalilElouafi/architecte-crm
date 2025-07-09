@@ -372,30 +372,30 @@ export default function PaymentModal({ payment, projects, projectId, onClose }) 
               </div>
 
               {/* Reference */}
-              <div className="lg:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Référence</label>
-                <input
-                  type="text"
-                  name="reference"
-                  value={formData.reference}
-                  onChange={handleChange}
-                  placeholder="Numéro de chèque, ID de transaction, etc."
-                  className="w-full px-3 py-2 text-sm rounded-md border border-gray-200 bg-gray-50 transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white"
-                />
-              </div>
+              <div className="flex-1">
+    <label className="block text-sm font-medium text-gray-700 mb-1">Référence</label>
+    <input
+      type="text"
+      name="reference"
+      value={formData.reference}
+      onChange={handleChange}
+      placeholder="Numéro de chèque, ID de transaction, etc."
+      className="w-full px-3 py-2 text-sm rounded-md border border-gray-200 bg-gray-50 transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white"
+    />
+  </div>
 
-              {/* Notes */}
-              <div className="lg:col-span-3">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
-                <textarea
-                  name="notes"
-                  rows={2}
-                  value={formData.notes}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 text-sm rounded-md border border-gray-200 bg-gray-50 transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white resize-none"
-                  placeholder="Informations supplémentaires sur ce paiement..."
-                />
-              </div>
+  {/* Notes */}
+  <div className="flex-1">
+    <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+    <textarea
+      name="notes"
+      rows={1}
+      value={formData.notes}
+      onChange={handleChange}
+      className="w-full px-3 py-2 text-sm rounded-md border border-gray-200 bg-gray-50 transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white resize-none"
+      placeholder="Informations supplémentaires"
+    />
+  </div>
             </div>
           </div>
 

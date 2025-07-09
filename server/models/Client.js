@@ -7,32 +7,32 @@ const Client = sequelize.define("Client", {
     primaryKey: true,
     autoIncrement: true,
   },
-  // Client type : individual or corporate
+  // Client type - individual or corporate
   clientType: {
     type: DataTypes.ENUM("individual", "corporate"),
     allowNull: false,
     defaultValue: "individual",
   },
 
-  // Individual client fields
+  // Individual client fields (can also have company info)
   firstName: {
     type: DataTypes.STRING,
-    allowNull: true, // Now optional since corporate clients won't have this
+    allowNull: true,
   },
   lastName: {
     type: DataTypes.STRING,
-    allowNull: true, // Now optional since corporate clients won't have this
+    allowNull: true,
   },
   cin: {
     type: DataTypes.STRING,
-    allowNull: true, // Only for individual clients
+    allowNull: true,
     unique: "cin_unique",
   },
 
-  // Corporate client fields
+  // Company fields (for both individual with business and corporate)
   companyName: {
     type: DataTypes.STRING,
-    allowNull: true, // Required for corporate clients
+    allowNull: true,
   },
   rc: {
     type: DataTypes.STRING,
@@ -47,6 +47,21 @@ const Client = sequelize.define("Client", {
   headquarters: {
     type: DataTypes.TEXT,
     allowNull: true, // Siège social
+  },
+
+  // Manager/Responsible person fields (for individual clients with companies)
+  managerName: {
+    type: DataTypes.STRING,
+    allowNull: true, // Nom du gérant
+  },
+  managerCIN: {
+    type: DataTypes.STRING,
+    allowNull: true, // CIN du gérant
+    unique: "manager_cin_unique",
+  },
+  managerPhone: {
+    type: DataTypes.STRING,
+    allowNull: true, // Téléphone du gérant
   },
 
   // Common fields

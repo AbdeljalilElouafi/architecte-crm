@@ -528,7 +528,7 @@ function ProjectsList({ projects, onEdit, onDelete, onProjectClick, currentPage,
                 {project.financialSummary ? (
                   <div className="text-sm">
                     <div className="text-gray-900">{project.financialSummary.totalPrice.toLocaleString()} MAD</div>
-                    <div className="text-green-600">{project.financialSummary.totalPaid.toLocaleString()} payé</div>
+                    <div className="text-green-600">{project.financialSummary.totalPaid.toLocaleString()} payés</div>
                   </div>
                 ) : (
                   <div className="text-sm text-gray-500">Aucune donnée financière</div>

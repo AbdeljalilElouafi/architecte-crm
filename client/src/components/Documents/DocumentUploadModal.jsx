@@ -149,7 +149,11 @@ export default function DocumentUploadModal({ document, projects, projectId, onC
   }
 
   return (
-    <Modal title={document ? "Modifier le document" : "Téléverser un document"} onClose={() => onClose(false)}>
+    <Modal
+      title={document ? "Modifier le document" : "Téléverser un document"}
+      onClose={() => onClose(false)}
+      size="lg"
+    >
       <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
         <form onSubmit={handleSubmit} className="space-y-6">
           {errors.submit && (
@@ -170,7 +174,7 @@ export default function DocumentUploadModal({ document, projects, projectId, onC
                 <label className="block text-sm font-semibold text-gray-700 mb-2">Projet *</label>
                 {projectId ? (
                   // Show read-only project when projectId is provided
-                  <div className="w-full px-3 py-2 text-sm rounded-md border-2 border-gray-200 bg-gray-100 text-gray-700">
+                  <div className="w-full px-3 py-2 text-sm rounded-md border border-gray-200 bg-gray-100 text-gray-700">
                     {getSelectedProject()?.title || "Projet sélectionné"}
                   </div>
                 ) : (
@@ -179,7 +183,7 @@ export default function DocumentUploadModal({ document, projects, projectId, onC
                     name="projectId"
                     value={formData.projectId}
                     onChange={handleChange}
-                    className={`w-full px-3 py-2 text-sm rounded-md border-2 transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/20 ${
+                    className={`w-full px-3 py-2 text-sm rounded-md border transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/20 ${
                       errors.projectId
                         ? "border-red-300 bg-red-50 focus:border-red-500"
                         : "border-gray-200 bg-gray-50 focus:border-blue-500 focus:bg-white"
@@ -204,7 +208,7 @@ export default function DocumentUploadModal({ document, projects, projectId, onC
                   value={formData.title}
                   onChange={handleChange}
                   placeholder="Nom du document"
-                  className={`w-full px-3 py-2 text-sm rounded-md border-2 transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/20 ${
+                  className={`w-full px-3 py-2 text-sm rounded-md border transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/20 ${
                     errors.title
                       ? "border-red-300 bg-red-50 focus:border-red-500"
                       : "border-gray-200 bg-gray-50 focus:border-blue-500 focus:bg-white"
@@ -219,7 +223,7 @@ export default function DocumentUploadModal({ document, projects, projectId, onC
                   name="category"
                   value={formData.category}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 text-sm rounded-md border-2 border-gray-200 bg-gray-50 transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white"
+                  className="w-full px-3 py-2 text-sm rounded-md border border-gray-200 bg-gray-50 transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white"
                 >
                   <option value="contract">📄 Contrat</option>
                   <option value="plan">📐 Plan</option>
@@ -237,7 +241,7 @@ export default function DocumentUploadModal({ document, projects, projectId, onC
                   rows={3}
                   value={formData.description}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 text-sm rounded-md border-2 border-gray-200 bg-gray-50 transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white resize-none"
+                  className="w-full px-3 py-2 text-sm rounded-md border border-gray-200 bg-gray-50 transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white resize-none"
                   placeholder="Description du document..."
                 />
               </div>
@@ -321,7 +325,7 @@ export default function DocumentUploadModal({ document, projects, projectId, onC
             <button
               type="button"
               onClick={() => onClose(false)}
-              className="px-6 py-3 bg-white text-gray-700 text-sm font-semibold rounded-lg border-2 border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 transition-colors"
+              className="px-6 py-3 bg-white text-gray-700 text-sm font-semibold rounded-lg border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 transition-colors"
             >
               Annuler
             </button>

@@ -13,6 +13,7 @@ const getAllClients = async (req, res) => {
         { firstName: { [Op.like]: `%${search}%` } },
         { lastName: { [Op.like]: `%${search}%` } },
         { companyName: { [Op.like]: `%${search}%` } },
+        { managerName: { [Op.like]: `%${search}%` } },
         { email: { [Op.like]: `%${search}%` } },
         { rc: { [Op.like]: `%${search}%` } },
         { ice: { [Op.like]: `%${search}%` } },
@@ -88,15 +89,22 @@ const createClient = async (req, res) => {
     const { clientType } = req.body
 
     if (clientType === "individual") {
+      // For individual clients, we need personal info
       if (!req.body.firstName || !req.body.lastName || !req.body.cin) {
         return res.status(400).json({
           message: "Pour un client individuel, le prénom, nom et CIN sont requis",
         })
       }
     } else if (clientType === "corporate") {
+      // For corporate clients, we need company info AND manager info
       if (!req.body.companyName || !req.body.rc || !req.body.ice) {
         return res.status(400).json({
           message: "Pour un client entreprise, la raison sociale, RC et ICE sont requis",
+        })
+      }
+      if (!req.body.managerName || !req.body.managerCIN) {
+        return res.status(400).json({
+          message: "Pour un client entreprise, le nom et CIN du gérant sont requis",
         })
       }
     }
@@ -107,7 +115,7 @@ const createClient = async (req, res) => {
     console.error("Create client error:", error)
     if (error.name === "SequelizeUniqueConstraintError") {
       return res.status(400).json({
-        message: "Un client avec ces informations existe déjà (CIN, RC ou ICE)",
+        message: "Un client avec ces informations existe déjà (CIN, RC, ICE ou CIN du gérant)",
       })
     }
     res.status(500).json({ message: "Internal server error" })
@@ -122,15 +130,22 @@ const updateClient = async (req, res) => {
     const { clientType } = req.body
 
     if (clientType === "individual") {
+      // For individual clients, we need personal info
       if (!req.body.firstName || !req.body.lastName || !req.body.cin) {
         return res.status(400).json({
           message: "Pour un client individuel, le prénom, nom et CIN sont requis",
         })
       }
     } else if (clientType === "corporate") {
+      // For corporate clients, we need company info AND manager info
       if (!req.body.companyName || !req.body.rc || !req.body.ice) {
         return res.status(400).json({
           message: "Pour un client entreprise, la raison sociale, RC et ICE sont requis",
+        })
+      }
+      if (!req.body.managerName || !req.body.managerCIN) {
+        return res.status(400).json({
+          message: "Pour un client entreprise, le nom et CIN du gérant sont requis",
         })
       }
     }
@@ -149,7 +164,7 @@ const updateClient = async (req, res) => {
     console.error("Update client error:", error)
     if (error.name === "SequelizeUniqueConstraintError") {
       return res.status(400).json({
-        message: "Un client avec ces informations existe déjà (CIN, RC ou ICE)",
+        message: "Un client avec ces informations existe déjà (CIN, RC, ICE ou CIN du gérant)",
       })
     }
     res.status(500).json({ message: "Internal server error" })

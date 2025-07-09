@@ -9,13 +9,13 @@ const RevenueChart = ({ stats }) => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [animationKey, setAnimationKey] = useState(0)
-  const [currentYear, setCurrentYear] = useState(2024)
+  const [currentYear, setCurrentYear] = useState(2025)
 
   useEffect(() => {
-    fetchMonthlyRevenue(2024) // Default to 2024 since that's where your data is
+    fetchMonthlyRevenue(2025) // Default 
   }, [])
 
-  const fetchMonthlyRevenue = async (year = 2024) => {
+  const fetchMonthlyRevenue = async (year = 2025) => {
     setLoading(true)
     try {
       const response = await dashboardAPI.getMonthlyRevenue(year)
