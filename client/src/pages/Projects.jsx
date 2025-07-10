@@ -244,6 +244,7 @@ export default function Projects() {
               className="pl-10 h-full  w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             />
           </div>
+          
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
@@ -256,6 +257,7 @@ export default function Projects() {
               </option>
             ))}
           </select>
+          
           <Select
             options={[
               { value: "", label: "Tous les clients" },

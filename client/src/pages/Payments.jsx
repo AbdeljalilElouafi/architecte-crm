@@ -233,19 +233,19 @@ export default function Payments() {
       <div className="bg-white p-4 rounded-lg shadow">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="relative">
-            <MagnifyingGlassIcon className="h-5 w-5 absolute left-1 top-1 text-gray-400" />
+            <MagnifyingGlassIcon className="h-5 w-5 absolute left-2 top-2 text-gray-400" />
             <input
               type="text"
               placeholder="Rechercher des paiements..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="pl-10 h-full w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             />
           </div>
           <select
             value={methodFilter}
             onChange={(e) => setMethodFilter(e.target.value)}
-            className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            className="rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
           >
             <option value="">Toutes les méthodes</option>
             <option value="cash">Espèces</option>
@@ -254,42 +254,43 @@ export default function Payments() {
             <option value="card">Carte</option>
           </select>
           <Select
-              options={[
-                { value: '', label: 'Tous les projets' },
-                ...projects.map(project => ({
-                  value: project.id,
-                  label: project.title
-                }))
-              ]}
-              value={
-                projectFilter
-                  ? {
-                      value: projectFilter,
-                      label: projects.find(p => p.id === projectFilter)?.title || 'Tous les projets'
-                    }
-                  : { value: '', label: 'Tous les projets' }
-              }
-              onChange={(selectedOption) => setProjectFilter(selectedOption?.value || '')}
-              isClearable={false}
-              className="mt-1"
-              classNamePrefix="select"
-              styles={{
-                control: (provided) => ({
-                  ...provided,
-                  borderRadius: '0.375rem',
-                  borderColor: '#d1d5db',
-                  boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
-                  '&:hover': {
-                    borderColor: '#d1d5db'
-                  },
-                  '&:focus-within': {
-                    borderColor: '#3b82f6',
-                    ring: '0 0 0 1px #3b82f6'
-                  },
-                  minHeight: '38px'
-                })
-              }}
-            />
+            options={[
+              { value: "", label: "Tous les projets" },
+              ...projects.map((project) => ({
+                value: project.id,
+                label: project.title,
+              })),
+            ]}
+            value={
+              projectFilter
+                ? {
+                    value: projectFilter,
+                    label: projects.find((p) => p.id === projectFilter)?.title || "Tous les projets",
+                  }
+                : { value: "", label: "Tous les projets" }
+            }
+            onChange={(selectedOption) => setProjectFilter(selectedOption?.value || "")}
+            isClearable={false}
+            className="basic-select"
+            classNamePrefix="select"
+            styles={{
+              control: (provided) => ({
+                ...provided,
+                borderRadius: "0.375rem",
+                borderColor: "#d1d5db",
+                boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+                "&:hover": {
+                  borderColor: "#d1d5db",
+                },
+                "&:focus-within": {
+                  borderColor: "#3b82f6",
+                  boxShadow: "0 0 0 1px #3b82f6",
+                },
+                minHeight: "38px",
+                width: "100%",
+              }),
+            }}
+          />
         </div>
       </div>
 
@@ -399,7 +400,6 @@ export default function Payments() {
                 ))}
               </tbody>
             </table>
-
             {/* Pagination */}
             {totalPages > 1 && (
               <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200">
@@ -452,7 +452,6 @@ export default function Payments() {
 
       {/* Modals */}
       {showModal && <PaymentModal payment={editingPayment} projects={projects} onClose={handleModalClose} />}
-
       {deleteModal.show && (
         <DeleteConfirmModal
           title="Supprimer le Paiement"

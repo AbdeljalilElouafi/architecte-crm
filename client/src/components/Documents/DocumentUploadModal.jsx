@@ -170,80 +170,86 @@ export default function DocumentUploadModal({ document, projects, projectId, onC
             </div>
 
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Projet *</label>
-                {projectId ? (
-                  // Show read-only project when projectId is provided
-                  <div className="w-full px-3 py-2 text-sm rounded-md border border-gray-200 bg-gray-100 text-gray-700">
-                    {getSelectedProject()?.title || "Projet sélectionné"}
-                  </div>
-                ) : (
-                  // Show dropdown when no projectId is provided
-                  <select
-                    name="projectId"
-                    value={formData.projectId}
+              {/* First Row: Project and Title */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Projet *</label>
+                  {projectId ? (
+                    // Show read-only project when projectId is provided
+                    <div className="w-full px-3 py-2 text-sm rounded-md border border-gray-200 bg-gray-100 text-gray-700">
+                      {getSelectedProject()?.title || "Projet sélectionné"}
+                    </div>
+                  ) : (
+                    // Show dropdown when no projectId is provided
+                    <select
+                      name="projectId"
+                      value={formData.projectId}
+                      onChange={handleChange}
+                      className={`w-full px-3 py-2 text-sm rounded-md border transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/20 ${
+                        errors.projectId
+                          ? "border-red-300 bg-red-50 focus:border-red-500"
+                          : "border-gray-200 bg-gray-50 focus:border-blue-500 focus:bg-white"
+                      }`}
+                    >
+                      <option value="">Sélectionner un projet</option>
+                      {availableProjects.map((project) => (
+                        <option key={project.id} value={project.id}>
+                          {project.title} - {project.client?.firstName} {project.client?.lastName}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                  {errors.projectId && <p className="mt-1 text-xs text-red-600">{errors.projectId}</p>}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Titre *</label>
+                  <input
+                    type="text"
+                    name="title"
+                    value={formData.title}
                     onChange={handleChange}
+                    placeholder="Nom du document"
                     className={`w-full px-3 py-2 text-sm rounded-md border transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/20 ${
-                      errors.projectId
+                      errors.title
                         ? "border-red-300 bg-red-50 focus:border-red-500"
                         : "border-gray-200 bg-gray-50 focus:border-blue-500 focus:bg-white"
                     }`}
+                  />
+                  {errors.title && <p className="mt-1 text-xs text-red-600">{errors.title}</p>}
+                </div>
+              </div>
+
+              {/* Second Row: Category and Description */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Catégorie</label>
+                  <select
+                    name="category"
+                    value={formData.category}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 text-sm rounded-md border border-gray-200 bg-gray-50 transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white"
                   >
-                    <option value="">Sélectionner un projet</option>
-                    {availableProjects.map((project) => (
-                      <option key={project.id} value={project.id}>
-                        {project.title} - {project.client?.firstName} {project.client?.lastName}
-                      </option>
-                    ))}
+                    <option value="contract">📄 Contrat</option>
+                    <option value="plan">📐 Plan</option>
+                    <option value="invoice">🧾 Facture</option>
+                    <option value="permit">📋 Permis</option>
+                    <option value="photo">📸 Photo</option>
+                    <option value="other">📁 Autre</option>
                   </select>
-                )}
-                {errors.projectId && <p className="mt-1 text-xs text-red-600">{errors.projectId}</p>}
-              </div>
+                </div>
 
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Titre *</label>
-                <input
-                  type="text"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleChange}
-                  placeholder="Nom du document"
-                  className={`w-full px-3 py-2 text-sm rounded-md border transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/20 ${
-                    errors.title
-                      ? "border-red-300 bg-red-50 focus:border-red-500"
-                      : "border-gray-200 bg-gray-50 focus:border-blue-500 focus:bg-white"
-                  }`}
-                />
-                {errors.title && <p className="mt-1 text-xs text-red-600">{errors.title}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Catégorie</label>
-                <select
-                  name="category"
-                  value={formData.category}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 text-sm rounded-md border border-gray-200 bg-gray-50 transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white"
-                >
-                  <option value="contract">📄 Contrat</option>
-                  <option value="plan">📐 Plan</option>
-                  <option value="invoice">🧾 Facture</option>
-                  <option value="permit">📋 Permis</option>
-                  <option value="photo">📸 Photo</option>
-                  <option value="other">📁 Autre</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Description</label>
-                <textarea
-                  name="description"
-                  rows={3}
-                  value={formData.description}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 text-sm rounded-md border border-gray-200 bg-gray-50 transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white resize-none"
-                  placeholder="Description du document..."
-                />
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Description</label>
+                  <textarea
+                    name="description"
+                    rows={1}
+                    value={formData.description}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 text-sm rounded-md border border-gray-200 bg-gray-50 transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white resize-none"
+                    placeholder="Description du document..."
+                  />
+                </div>
               </div>
             </div>
           </div>
