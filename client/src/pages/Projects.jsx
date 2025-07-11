@@ -202,7 +202,8 @@ export default function Projects() {
           <div className="flex rounded-md shadow-sm">
             <button
               onClick={() => setViewMode("kanban")}
-              className={`px-4 py-2 text-sm font-medium rounded-l-md border ${
+              className={`px-4 py-2 text-sm font-medium rounded-l-md border focus:outline-none focus:ring-0
+             ${
                 viewMode === "kanban"
                   ? "bg-blue-600 text-white border-blue-600"
                   : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
@@ -212,7 +213,8 @@ export default function Projects() {
             </button>
             <button
               onClick={() => setViewMode("list")}
-              className={`px-4 py-2 text-sm font-medium rounded-r-md border-t border-r border-b ${
+              className={`px-4 py-2 text-sm font-medium rounded-r-md border-t border-r border-b focus:outline-none focus:ring-0
+              ${
                 viewMode === "list"
                   ? "bg-blue-600 text-white border-blue-600"
                   : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
@@ -491,7 +493,7 @@ function ProjectsList({ projects, onEdit, onDelete, onProjectClick, currentPage,
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="text-sm text-gray-900">
-                  {project.client?.firstName} {project.client?.lastName}
+                  {project.client?.firstName ?? companyName} {project.client?.lastName}
                 </div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">

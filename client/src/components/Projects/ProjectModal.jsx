@@ -119,7 +119,7 @@ export default function ProjectModal({ project, clients, onClose }) {
             </div>
           )}
 
-          {/* Basic Info */}
+{/* Basic Info */}
           <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
             <div className="flex items-center mb-3">
               <div className="w-1 h-5 bg-blue-500 rounded-full mr-2"></div>
@@ -184,27 +184,19 @@ export default function ProjectModal({ project, clients, onClose }) {
               </div>
             </div>
 
-            <div className="mt-4">
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Description</label>
-              <textarea
-                name="description"
-                rows={1}
-                value={formData.description}
-                onChange={handleChange}
-                className="w-full px-3 py-2 text-sm rounded-md border border-gray-200 bg-gray-50 resize-none"
-                placeholder="Description du projet..."
-              />
-            </div>
-          </div>
+            <div className="grid grid-cols-3 gap-4 mt-4">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Description</label>
+                <textarea
+                  name="description"
+                  rows={1}
+                  value={formData.description}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 text-sm rounded-md border border-gray-200 bg-gray-50 resize-none"
+                  placeholder="Description du projet..."
+                />
+              </div>
 
-          {/* Project Details */}
-          <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
-            <div className="flex items-center mb-3">
-              <div className="w-1 h-5 bg-green-500 rounded-full mr-2"></div>
-              <h3 className="text-sm font-semibold text-gray-800">Détails du projet</h3>
-            </div>
-
-            <div className="grid grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">Statut</label>
                 <select
@@ -236,11 +228,7 @@ export default function ProjectModal({ project, clients, onClose }) {
                   <option value="urgent">Urgente</option>
                 </select>
               </div>
-
-              <div />
             </div>
-
-
           </div>
 
           {/* Financial & Location Info */}
